@@ -46,8 +46,8 @@ public class Node<TPayload> {
         return _children;
     }
 
-    public Iterator<Map.Entry<Character, Node<TPayload>>> sortedChildren() {
-        return new TreeMap<>(children()).entrySet().iterator();
+    public Set<Map.Entry<Character, Node<TPayload>>> sortedChildren() {
+        return new TreeMap<>(children()).entrySet();
     }
 
     public int getRecursiveChildNodeCount() {
