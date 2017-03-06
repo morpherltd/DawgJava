@@ -48,11 +48,13 @@ public class DawgBuilderTests extends TestCase {
 
 
         Iterator<Map.Entry<String, Boolean>> iterator = dawg.iterator();
+        int count = 0;
         while (iterator.hasNext()) {
-            System.out.println(iterator.next());
+            iterator.next();
+            count++;
         }
 
-//        assertEquals(3, dawg.iterator());
+        assertEquals(3, count);
     }
 
     private static String iterToStr(Iterable<Character> chars) {
