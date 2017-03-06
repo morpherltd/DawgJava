@@ -79,7 +79,7 @@ public class OldDawg<TPayload> implements IDawg<TPayload> {
         }
     }
 
-    public void SaveAsYaleDawg (DataOutputStream writer,
+    public void saveAsYaleDawg (DataOutputStream writer,
                                 BiConsumer<DataOutputStream, TPayload>
                                     writePayload) throws IOException {
         final int version = 2;

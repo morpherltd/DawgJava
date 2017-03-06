@@ -79,7 +79,7 @@ public class DawgBuilder<TPayload> {
     }
 
     public Dawg<TPayload> buildDawg() {
-        LevelBuilder<TPayload>.buildLevelsExcludingRoot(root);
+        LevelBuilder.<TPayload>buildLevelsExcludingRoot(root);
         return new Dawg<TPayload>(new OldDawg<TPayload>(root));
     }
 }
