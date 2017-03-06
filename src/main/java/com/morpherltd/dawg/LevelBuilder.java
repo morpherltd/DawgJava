@@ -11,10 +11,10 @@ public class LevelBuilder<TPayload> {
 
         push(stack, root);
 
+        Map.Entry<Character, Node<TPayload>> cur = null;
         while (stack.size() > 0) {
             if (stack.peek().ChildIterator.hasNext()) {
-                Map.Entry<Character, Node<TPayload>> cur =
-                    stack.peek().ChildIterator.next();
+                cur = stack.peek().ChildIterator.next();
                 push(stack, cur.getValue());
             } else {
                 StackNode<TPayload> current = stack.pop();
@@ -30,18 +30,15 @@ public class LevelBuilder<TPayload> {
                     HashMap<NodeWrapper<TPayload>, NodeWrapper<TPayload>>
                         dictionary = levels.get(level);
 
-                    Map.Entry<Character, Node<TPayload>> currentParentChild =
-                        parent.ChildIterator.next();
-
                     NodeWrapper<TPayload> nodeWrapper = new NodeWrapper<>(
-                        current.Node, parent.Node, currentParentChild.getKey()
+                        current.Node, parent.Node, cur.getKey()
                     );
 
                     if (dictionary.containsKey(nodeWrapper)) {
                         NodeWrapper<TPayload> existing =
                             dictionary.get(nodeWrapper);
                         parent.Node.children().put(
-                            currentParentChild.getKey(), existing.Node
+                            cur.getKey(), existing.Node
                         );
 
                     } else {

@@ -14,14 +14,7 @@ public class OldDawg<TPayload> implements IDawg<TPayload> {
         Node<TPayload> node = findNode(word);
 
         if (node == null) {
-            try {
-                return cls.newInstance();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return null;
+            return NewInstance.make(cls);
         } else {
             return node.getPayload();
         }
