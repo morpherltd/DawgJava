@@ -1,10 +1,14 @@
 package com.morpherltd.dawg;
 
+import com.google.common.base.Defaults;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DawgBuilder<TPayload> {
-    final Node<TPayload> root = new Node<TPayload>();
+    final Node<TPayload> root = new Node<>();
 
     final ArrayList<Node<TPayload>> lastPath = new ArrayList<>();
     String lastKey = "";
@@ -56,11 +60,18 @@ public class DawgBuilder<TPayload> {
         node.setPayload(value);
     }
 
-    private boolean tryGetValue(Iterable<Character> key, _<TPayload> value) {
+    public boolean tryGetValue(Iterable<Character> key, _<TPayload> value, TPayload def) {
         try {
             value.s(cls.newInstance());
         } catch (InstantiationException e) {
-            e.printStackTrace();
+//            TPayload def = Defaults.defaultValue(cls);
+            try {
+                Constructor<TPayload> ctor = cls.getConstructor(String.class);
+                TPayload tp = ctor.newInstance(def.toString());
+                value.s(tp);
+            } catch (Exception e1) {
+                throw new RuntimeException(e1);
+            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -80,6 +91,6 @@ public class DawgBuilder<TPayload> {
 
     public Dawg<TPayload> buildDawg() {
         LevelBuilder.<TPayload>buildLevelsExcludingRoot(root);
-        return new Dawg<TPayload>(new OldDawg<TPayload>(root));
+        return new Dawg<TPayload>(new OldDawg<TPayload>(root, cls), cls);
     }
 }

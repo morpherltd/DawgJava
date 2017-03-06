@@ -1,21 +1,17 @@
 package com.morpherltd.dawg;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class Dawg<TPayload> implements Iterable<Map.Entry<String, TPayload>> {
     private final IDawg<TPayload> dawg;
+    private final Class<TPayload> cls;
 
-    public Dawg(IDawg<TPayload> dawg) {
+    public Dawg(IDawg<TPayload> dawg, Class<TPayload> cls) {
         this.dawg = dawg;
-
+        this.cls = cls;
 
         Writers.put(Boolean.class, (BiConsumer<DataOutputStream, Boolean>) (r, payload) -> {
             try { r.writeBoolean(payload); } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
@@ -103,55 +99,153 @@ public class Dawg<TPayload> implements Iterable<Map.Entry<String, TPayload>> {
         return dawg.getNodeCount ();
     }
 
-    public Iterable<Map.Entry<String, TPayload>> GetEnumerator()
-    {
-        return matchPrefix("").GetEnumerator ();
+    public Iterable<Map.Entry<String, TPayload>> getEnumerator()
+            throws IllegalAccessException, InstantiationException {
+        return matchPrefix(new ArrayList<>());
     }
 
-    public void saveTo(DataOutputStream stream, BiConsumer<DataOutputStream, TPayload> writePayload)
-    {
+    @Override
+    public Iterator<Map.Entry<String, TPayload>> iterator() {
+        try {
+            return getEnumerator().iterator();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void saveTo(DataOutputStream stream,
+                       BiConsumer<DataOutputStream, TPayload> writePayload)
+            throws Exception {
         saveAsYaleDawg(stream, writePayload != null ? writePayload : getStandardWriter());
     }
 
     // Testing only.
-    public void saveAsYaleDawg(DataOutputStream stream, BiConsumer<DataOutputStream, TPayload> writePayload)
-    {
-        save (stream, (d, w) -> d.saveAsYaleDawg (w, writePayload != null ? writePayload : getStandardWriter()));
+    public void saveAsYaleDawg(DataOutputStream stream,
+                               BiConsumer<DataOutputStream, TPayload>
+                                   writePayload)
+            throws Exception {
+        save(stream, (d, w) -> {
+            try {
+                d.saveAsYaleDawg(w, writePayload != null ? writePayload : getStandardWriter());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     // Testing only.
-    public void saveAsMatrixDawg(DataOutputStream stream, BiConsumer<DataOutputStream, TPayload> writePayload)
-    {
-        save(stream, (d, w) -> d.saveAsMatrixDawg (w, writePayload != null ? writePayload : getStandardWriter()));
+    public void saveAsMatrixDawg(DataOutputStream stream,
+                                 BiConsumer<DataOutputStream, TPayload>
+                                     writePayload)
+            throws Exception {
+        save(stream, (d, w) -> {
+            try {
+                d.saveAsMatrixDawg(w, writePayload != null ? writePayload : getStandardWriter());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    private void save(DataOutputStream stream, BiConsumer<OldDawg<TPayload>, DataOutputStream> save)
-    {
+    private void save(DataOutputStream stream,
+                      BiConsumer<OldDawg<TPayload>, DataOutputStream> pSave)
+            throws Exception {
         // Do not close the BinaryWriter. Users might want to append more data to the stream.
         DataOutputStream writer = new DataOutputStream(stream);
 
         writer.write(getSignature());
 
-        save((OldDawg<TPayload>) dawg, writer);
+        pSave.accept((OldDawg<TPayload>) dawg, writer);
     }
 
-    static BiConsumer<DataOutputStream, TPayload> getStandardWriter ()
+    BiConsumer<DataOutputStream, TPayload> getStandardWriter ()  // TODO: ok if not static?
     {
-        object writer;
-        if (!Writers.TryGetValue(typeof (TPayload), out writer))
-        {
-            throw new Exception("Could not find a serialization method for " + typeof(TPayload).Name + ". Use a SaveXXX overload with a 'writePayload' parameter.");
+        if (!Writers.containsKey(cls)) {
+            throw new RuntimeException(
+                "Could not find a serialization method for " + cls +
+                ". Use a saveXXX overload with a 'writePayload' parameter.");
+
         }
-        return (Action <BinaryWriter, TPayload>) writer;
+
+        return (BiConsumer<DataOutputStream, TPayload>) Writers.get(cls);
     }
 
     static final HashMap<Class, Object> Writers = new HashMap<>();
     static final HashMap<Class, Object> Readers = new HashMap<>();
 
-
-
-    @Override
-    public Iterator<Map.Entry<String, TPayload>> iterator() {
-        return getEnumerator();
+    public Dawg<TPayload> load(DataInputStream stream, Function<DataInputStream, TPayload> readPayload) throws IOException { // TODO: ok if not static?
+        Function<DataInputStream, TPayload> f = readPayload != null ? readPayload : (Function<DataInputStream, TPayload>) Readers.get(cls);
+        return new Dawg<TPayload>(loadIDawg(stream, f), cls);
     }
+
+    private IDawg<TPayload> loadIDawg(DataInputStream stream,
+                                      Function<DataInputStream, TPayload>
+                                          readPayload) throws IOException {
+        DataInputStream reader = new DataInputStream(stream);
+        int signature = getSignature();
+        int firstInt = reader.readInt();
+
+        if (firstInt == signature) {
+            int version = reader.readInt();
+
+            switch (version)
+            {
+                case 1: return new <TPayload>MatrixDawg(reader, readPayload, cls);
+                case 2: return new <TPayload>YaleDawg(reader, readPayload, cls);
+            }
+
+            throw new RuntimeException(
+                "This file was produced by a more recent version of DawgSharp."
+            );
+        }
+
+        // The old, unversioned, file format had the number of nodes as the first 4 bytes of the stream.
+        // It is extremely unlikely that they happen to be exactly the same as the signature "DAWG".
+        OldDawg<TPayload> result = loadOldDawg(reader, firstInt, readPayload);
+        reader.close();
+
+        return result;
+    }
+
+    private static int getSignature() throws UnsupportedEncodingException {
+        byte[] bytes = "DAWG".getBytes("UTF-8");
+        return bytes [0]
+            + bytes [1] << 8
+            + bytes [2] << 16
+            + bytes [3] << 24;
+    }
+
+    private OldDawg loadOldDawg(DataInputStream reader,
+            int nodeCount, Function<DataInputStream, TPayload> readPayload)
+            throws IOException {
+        Node<TPayload>[] nodes = (Node<TPayload>[]) new Object[nodeCount];
+
+        int rootIndex = reader.readInt();
+
+        char[] chars = new char[nodeCount];
+        for (int i = 0; i < nodeCount; i++) {
+            chars[i] = reader.readChar();
+        }
+
+        for (int i = 0; i < nodeCount; ++i)
+        {
+            Node<TPayload> node = new Node<> ();
+
+            short childCount = reader.readShort();
+
+            while (childCount --> 0)
+            {
+                int childIndex = reader.readInt();
+
+                node.children().put(chars[childIndex], nodes[childIndex]);
+            }
+
+            node.setPayload(readPayload.apply(reader));
+
+            nodes [i] = node;
+        }
+
+        return new <TPayload>OldDawg(nodes [rootIndex], cls);
+    }
+
 }

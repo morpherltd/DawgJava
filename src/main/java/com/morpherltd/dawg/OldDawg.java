@@ -58,7 +58,9 @@ public class OldDawg<TPayload> implements IDawg<TPayload> {
     }
 
     @Override
-    public Iterable<Map.Entry<String, TPayload>> matchPrefix(Iterable<Character> prefix) {
+    public Iterable<Map.Entry<String, TPayload>> matchPrefix(
+            Iterable<Character> prefix)
+            throws InstantiationException, IllegalAccessException {
         Node<TPayload> node = findNode(prefix);
 
 //        if (node == null) return Enumerable.Empty <KeyValuePair <string, TPayload>> ();
@@ -67,7 +69,7 @@ public class OldDawg<TPayload> implements IDawg<TPayload> {
 
         sb.append(prefix.toString());
 
-        return new PrefixMatcher<TPayload>(sb).matchPrefix(node);
+        return new PrefixMatcher<TPayload>(sb, cls).matchPrefix(node);
     }
 
     public class NodeByPayloadComparer implements Comparator<Node<TPayload>> {
