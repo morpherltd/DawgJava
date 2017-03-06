@@ -229,7 +229,7 @@ public class Dawg<TPayload> implements Iterable<Map.Entry<String, TPayload>> {
 
         for (int i = 0; i < nodeCount; ++i)
         {
-            Node<TPayload> node = new Node<> ();
+            Node<TPayload> node = new Node<> (cls);
 
             short childCount = reader.readShort();
 

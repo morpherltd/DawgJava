@@ -8,21 +8,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DawgBuilder<TPayload> {
-    final Node<TPayload> root = new Node<>();
+    final Node<TPayload> root;
 
     final ArrayList<Node<TPayload>> lastPath = new ArrayList<>();
     String lastKey = "";
 
     Class<TPayload> cls;
 
-    public DawgBuilder(Class<TPayload> c) {
-        cls = c;
+    public DawgBuilder(Class<TPayload> cls) {
+        this.cls = cls;
+        root = new Node<>(cls);
     }
 
-    public void insert(Iterable<Character> key, TPayload value) {
-        String strKey = String.valueOf(key);
-        if (strKey != null) { // TODO: same in Java?
-            insertLastPath(strKey, value);
+    public void insert(String key, TPayload value) {
+        if (key != null) { // TODO: same in Java?
+            insertLastPath(key, value);
         } else {
             doInsert(root, key, value);
         }
@@ -52,22 +52,23 @@ public class DawgBuilder<TPayload> {
     }
 
     private static <TPayload> void doInsert(Node<TPayload> node,
-                                            Iterable<Character> key,
+                                            String key,
                                             TPayload value) {
-        for (char c : key) {
+        for (int i = 0; i < key.length(); i++) {
+            char c = key.charAt(i);
             node = node.getOrAddEdge(c);
         }
         node.setPayload(value);
     }
 
-    public boolean tryGetValue(Iterable<Character> key, _<TPayload> value, TPayload def) {
+    public boolean tryGetValue(String key, _<TPayload> value) {
         try {
             value.s(cls.newInstance());
         } catch (InstantiationException e) {
 //            TPayload def = Defaults.defaultValue(cls);
             try {
                 Constructor<TPayload> ctor = cls.getConstructor(String.class);
-                TPayload tp = ctor.newInstance(def.toString());
+                TPayload tp = ctor.newInstance(DefaultVals.get(cls).toString());
                 value.s(tp);
             } catch (Exception e1) {
                 throw new RuntimeException(e1);
@@ -78,7 +79,8 @@ public class DawgBuilder<TPayload> {
 
         Node<TPayload> node = this.root;
 
-        for (char c : key) {
+        for (int i = 0; i < key.length(); i++) {
+            char c = key.charAt(i);
             node = node.getChild(c);
 
             if (node == null) return false;

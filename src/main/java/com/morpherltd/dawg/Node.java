@@ -9,6 +9,12 @@ public class Node<TPayload> {
 
     private TPayload _payload;
     private boolean _payloadSet;
+    private Class<TPayload> cls;
+
+    public Node(Class<TPayload> cls) {
+        this.cls = cls;
+        _payload = (TPayload) DefaultVals.get(this.cls);
+    }
 
     public TPayload getPayload() {
         return _payload;
@@ -22,7 +28,7 @@ public class Node<TPayload> {
     public Node<TPayload> getOrAddEdge (char c) {
         Node<TPayload> newNode;
         if (!_children.containsKey(c)) {
-            newNode = new Node<>();
+            newNode = new Node<>(cls);
             _children.put(c, newNode);
         } else {
             newNode = _children.get(c);
