@@ -137,10 +137,12 @@ public class OldDawg<TPayload> implements IDawg<TPayload> {
 
         writer.writeInt(totalChildCount);
 
-        writeChildrenNoLength(writer, allNodes, nodeIndex, allChars);
+        char[] allCharsArr = sortedAllChars.toString().toCharArray();
+
+        writeChildrenNoLength(writer, allNodes, nodeIndex, allCharsArr);
     }
 
-    public void SaveAsMatrixDawg(DataOutputStream writer,
+    public void saveAsMatrixDawg(DataOutputStream writer,
                                  BiConsumer<DataOutputStream, TPayload>
                                      writePayload) throws IOException {
         final int version = 1;
@@ -206,50 +208,69 @@ public class OldDawg<TPayload> implements IDawg<TPayload> {
             writer.writeChar(c);
         }
 
-        writeChildren(writer, nodeIndex, hasBoth, allChars);
-        writeChildren(writer, nodeIndex, hasChildren, allChars);
+        char[] allCharsArr = sortedAllChars.toString().toCharArray();
+
+        writeChildren(writer, nodeIndex, hasBoth, allCharsArr);
+        writeChildren(writer, nodeIndex, hasChildren, allCharsArr);
     }
 
     private static <TPayload> void writeChildren(
-            DataOutputStream writer, HashMap<Node<TPayload>, Integer> nodeIndex,
-            Node<TPayload>[] nodes, char[] allChars) throws IOException {
-        writer.writeInt(nodes.length);
+            DataOutputStream writer,
+            HashMap<Node<TPayload>, Integer> nodeIndex,
+            ArrayList<Node<TPayload>> nodes,
+            char[] allChars) throws IOException {
+        writer.writeInt(nodes.size());
 
         writeChildrenNoLength(writer, nodes, nodeIndex, allChars);
     }
 
     private static <TPayload> void writeChildrenNoLength(
-            DataOutputStream writer, Iterable<Node<TPayload>> nodes,
-            Dictionary<Node<TPayload>, Integer> nodeIndex, char[] allChars)
-    {
-        var charToIndexPlusOne = MatrixDawg<TPayload>.getCharToIndexPlusOneMap(
+            DataOutputStream writer,
+            Iterable<Node<TPayload>> nodes,
+            HashMap<Node<TPayload>, Integer> nodeIndex,
+            char[] allChars) throws IOException {
+        short[] charToIndexPlusOne = MatrixDawg.getCharToIndexPlusOneMap(
             allChars
         );
 
-        char firstChar = allChars.FirstOrDefault();
+        char firstChar = allChars[0];
 
-        foreach (var node in nodes)
+        for (Node<TPayload> node : nodes)
         {
-            WriteInt (writer, node.Children.Count, allChars.Length + 1);
+            writeInt (writer, node.children().size(), allChars.length + 1);
 
-            foreach (var child in node.Children.OrderBy(c => c.Key))
+            for (Map.Entry<Character, Node<TPayload>> child
+                : node.sortedChildren()) // todo ok?
             {
-                int charIndex = charToIndexPlusOne [child.Key - firstChar] - 1;
+                int charIndex = charToIndexPlusOne [child.getKey() - firstChar] - 1;
 
-                WriteInt (writer, charIndex, allChars.Length);
+                writeInt (writer, charIndex, allChars.length);
 
-                writer.Write (nodeIndex [child.Value]);
+                writer.write(nodeIndex.get(child.getValue()));
             }
         }
     }
 
-    @Override
-    public int getNodeCount() {
-        return 0;
+    private static void writeInt(DataOutputStream writer,
+                                 int charIndex, int countOfPossibleValues)
+            throws IOException {
+        if (countOfPossibleValues > 256)
+        {
+            writer.write((short) charIndex);
+        }
+        else
+        {
+            writer.write((byte) charIndex);
+        }
     }
 
     public OldDawg(Node<TPayload> root, Class<TPayload> cls) {
         this.root = root;
         this.cls = cls;
+    }
+
+    @Override
+    public int getNodeCount() {
+        return root.getRecursiveChildNodeCount ();
     }
 }
