@@ -35,7 +35,10 @@ public class DawgBuilder<TPayload> {
             ++i;
         }
 
+        System.out.println("Removing: " + i + " " + (lastPath.size()));
         lastPath.subList(i, lastPath.size()).clear();
+        System.out.println(lastPath);
+
 
         lastKey = strKey;
 

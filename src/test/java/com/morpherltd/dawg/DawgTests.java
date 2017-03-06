@@ -5,8 +5,7 @@ import junit.framework.TestCase;
 
 public class DawgTests extends TestCase {
 
-    public void testNodeCount ()
-    {
+    public void testNodeCount () {
         DawgBuilder<Integer> dawgBuilder = new DawgBuilder<>(Integer.class);
 
         dawgBuilder.insert(Lists.charactersOf("tip"), 3);
@@ -19,11 +18,9 @@ public class DawgTests extends TestCase {
     }
 
     private class DawgTestsHelper<TPayload> {
-        public Dawg<TPayload> getDawg(DawgBuilder<TPayload> dawgBuilder)
-        {
+        public Dawg<TPayload> getDawg(DawgBuilder<TPayload> dawgBuilder) {
             return dawgBuilder.buildDawg();
         }
-
     }
 
 }

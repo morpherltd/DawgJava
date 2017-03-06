@@ -266,6 +266,6 @@ public class OldDawg<TPayload> implements IDawg<TPayload> {
 
     @Override
     public int getNodeCount() {
-        return root.getRecursiveChildNodeCount ();
+        return root.getRecursiveChildNodeCount();
     }
 }

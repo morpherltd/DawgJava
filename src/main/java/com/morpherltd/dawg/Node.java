@@ -61,10 +61,10 @@ public class Node<TPayload> {
     }
 
     public ArrayList<Node<TPayload>> getAllDistinctNodes() {
-        ArrayList<Node<TPayload>> result = new ArrayList<>();
-
         HashSet<Node<TPayload>> visitedNodes = new HashSet<>();
         visitedNodes.add(this);
+
+        ArrayList<Node<TPayload>> result = new ArrayList<>();
         result.add(this);
 
         Deque<Iterator<Map.Entry<Character, Node<TPayload>>>> deque =
@@ -73,11 +73,16 @@ public class Node<TPayload> {
             this.children().entrySet().iterator();
         deque.push(iterator);
 
+        int nivo = 0;
         for (;;) {
-            Iterator<Map.Entry<Character, Node<TPayload>>> cur =
+            Iterator<Map.Entry<Character, Node<TPayload>>> curIterator =
                 deque.peek();
-            if (cur.hasNext()) {
-                Node<TPayload> node = cur.next().getValue();
+
+            if (curIterator.hasNext()) {
+                Map.Entry<Character, Node<TPayload>> curPair = curIterator.next();
+                System.out.println("Nivo: " + nivo + ", key: " + curPair.getKey());
+
+                Node<TPayload> node = curPair.getValue();
                 if (visitedNodes.contains(node)) {
                     continue;
                 }
@@ -87,9 +92,18 @@ public class Node<TPayload> {
                 deque.push(node.children().entrySet().iterator());
 
             } else {
+                nivo ++;
                 deque.pop();
                 if (deque.size() == 0) break;
             }
+        }
+
+        for (Node<TPayload> a : result) {
+            System.out.println(a.getPayload());
+        }
+        System.out.println("visited:");
+        for (Node<TPayload> a : visitedNodes) {
+            System.out.println(a.getPayload());
         }
 
         return result;

@@ -30,8 +30,8 @@ public class PrefixMatcher<TPayload> {
         {
             sb.append(child.getKey());
 
-            for (Map.Entry<String, TPayload> kvp : matchPrefix(child.getValue()))
-            {
+            for (Map.Entry<String, TPayload> kvp
+                : matchPrefix(child.getValue())) {
                 result.add(kvp);
             }
 
