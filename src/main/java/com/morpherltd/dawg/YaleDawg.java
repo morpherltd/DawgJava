@@ -1,5 +1,6 @@
 package com.morpherltd.dawg;
 
+import com.morpherltd.dawg.helpers.BinaryUtil;
 import com.morpherltd.dawg.helpers.MReader;
 
 import java.io.IOException;
@@ -11,17 +12,6 @@ import static com.morpherltd.dawg.MatrixDawg.readArray;
 
 public class YaleDawg<TPayload> implements IDawg<TPayload> {
     private final Class<TPayload> cls;
-
-    class Child {
-        public final int Index;
-        public final short CharIndex;
-
-        public Child(int index, short charIndex)
-        {
-            Index = index;
-            CharIndex = charIndex;
-        }
-    }
 
     private final TPayload[] payloads;
     private final char[] indexToChar;
@@ -40,27 +30,65 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
 
         // The nodes are grouped by (has payload, has children).
         nodeCount = reader.readInt();
+        System.out.println("nodeCount: " + nodeCount);
 
         rootNodeIndex = reader.readInt();
+        System.out.println("rootNodeIndex: " + rootNodeIndex);
 
         payloads = MatrixDawg.<TPayload>readArray(reader, readPayload);
 
-        Character[] tmpChars = MatrixDawg.<Character>readArray(reader, (MReader r) -> {
+        final boolean[] ja = {true};
+        Character[] tmpChars = MatrixDawg.readCharArray(reader, (MReader r) -> {
             try {
-                return r.readChar();
+                if (ja[0])
+                    r.readByte();
+                ja[0] = false;
+
+
+                char ch = r.readChar();
+                System.out.println("Char: " + ch);
+                System.out.println("Char bin: " + Integer.toBinaryString(0x100 + ch).substring(2));
+                return (Character)ch;
             } catch (IOException e) { throw new RuntimeException(e); }
         });
-        indexToChar = tmpChars.toString().toCharArray();
+
+        System.out.println("tmpChars:");
+        indexToChar = new char[tmpChars.length];
+        for (int i = 0; i < tmpChars.length; i++) {
+            char ccc = tmpChars[i];
+            indexToChar[i] = ccc;
+            System.out.println("\t" + Integer.toBinaryString(0x100 + tmpChars[i]).substring(2));
+        }
+        System.out.println();
+
+//        indexToChar = tmpChars.toString().toCharArray();
+
+        System.out.println("stuff: '" + tmpChars.toString() + "'");
+        System.out.println("ichar len: " + indexToChar.length);
+        for (char ccc : indexToChar) {
+            System.out.print(ccc + ",");
+        }
+        System.out.println();
 
         charToIndexPlusOne = MatrixDawg.<TPayload>getCharToIndexPlusOneMap(indexToChar);
+
+        System.out.println("charToIndexPlusOne:");
+        System.out.println(charToIndexPlusOne);
+//        for(short aa : charToIndexPlusOne)
+//        {
+//            System.out.println("\t" + aa);
+//        }
+        System.out.println("charToIndexPlusOne len:");
+        System.out.println(charToIndexPlusOne.length);
 
         firstChildForNode = new int[nodeCount+1];
 
         int firstChildForNode_i = 0;
 
         int totalChildCount = reader.readInt();
+        System.out.println("totalChildCount: " + totalChildCount);
 
-        children = (Child[]) new Object[totalChildCount];
+        children = new Child[totalChildCount];
 
         firstChildForNode [nodeCount] = totalChildCount;
 

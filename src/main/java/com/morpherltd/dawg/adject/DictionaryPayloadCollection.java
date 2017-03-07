@@ -58,14 +58,18 @@ public class DictionaryPayloadCollection {
             throws IOException {
         int length = r.readInt();
 
+        if (length < 0) {
+            throw new RuntimeException("Length can't be less than 0: " + length);
+        }
+
         if (length == 0) {
             return null;
         } else {
             ArrayList<DictionaryPayload> arr = new ArrayList<>();
             for (int i = 0; i < length; i++) {  // TODO: Possible bug in the orig code? < or <= ?
                 DictionaryPayload dp = new DictionaryPayload();
-//                dp.NounSuffix = DataStreamStrings.readString(r);
-//                dp.AdjvSuffix = DataStreamStrings.readString(r);
+                dp.NounSuffix = r.readString();
+                dp.AdjvSuffix = r.readString();
                 arr.add(dp);
             }
             return new DictionaryPayloadCollection(arr);

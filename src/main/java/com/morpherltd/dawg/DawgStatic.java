@@ -65,6 +65,7 @@ public class DawgStatic<TPayload> {
         Node<TPayload>[] nodes = (Node<TPayload>[]) new Object[nodeCount];
 
         int rootIndex = reader.readInt();
+        System.out.println("rootIndex: " + rootIndex);
 
         char[] chars = new char[nodeCount];
         for (int i = 0; i < nodeCount; i++) {
@@ -76,10 +77,12 @@ public class DawgStatic<TPayload> {
             Node<TPayload> node = new Node<> (cls);
 
             short childCount = reader.readShort();
+            System.out.println("childCount: " + childCount);
 
             while (childCount --> 0)
             {
                 int childIndex = reader.readInt();
+                System.out.println("childIndex: " + childIndex);
 
                 node.children().put(chars[childIndex], nodes[childIndex]);
             }

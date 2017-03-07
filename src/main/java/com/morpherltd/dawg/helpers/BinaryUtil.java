@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 
 /**
  * Util for pulling out the binary data elements from .net BinaryWriter class.
@@ -52,14 +53,33 @@ public class BinaryUtil {
     }
 
     public static char getChar(final InputStream fin) throws IOException {
-        byte[] buffer = new byte[1];
+        byte[] buffer = new byte[2];
         ByteBuffer bb = ByteBuffer.wrap(buffer);
         if (fin.read(buffer) < 0) {
             throw new IOException("EOF");
         }
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.position(0);
-        return bb.getChar();
+
+        System.out.println(String.format("%8s", Integer.toBinaryString(buffer[0] & 0xFF)).replace(' ', '0')); // 10000001
+        System.out.println(String.format("%8s", Integer.toBinaryString(buffer[1] & 0xFF)).replace(' ', '0')); // 10000001
+        System.out.println(String.format("%02X ", buffer[0]));
+        System.out.println(String.format("%02X ", buffer[1]));
+        System.out.println("---");
+
+//        return bb.getChar();
+        return new String(buffer).charAt(0);
+//        String v = new String( bb.array(), Charset.forName("UTF-8") );
+//        return v.charAt(0);
+
+//        byte[] buffer = new byte[80];
+//        fin.read(buffer);
+//        System.out.println(buffer);
+//
+//        for (int i = 0; i < 80; i++)
+//            System.out.println(String.format("%8s", Integer.toBinaryString(buffer[i] & 0xFF)).replace(' ', '0')); // 10000001
+//
+//        return 'a';
     }
 
     public static short getShort(final InputStream fin) throws IOException {

@@ -236,13 +236,32 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
     public static short[] getCharToIndexPlusOneMap(char [] uniqueChars) {
         if (uniqueChars.length == 0) return null;
 
+        System.out.println("unique len: " + uniqueChars.length);
+
+        System.out.println("binaries:");
+        for (int i = 0; i < uniqueChars.length; ++i)
+            System.out.println(Integer.toBinaryString(0x100 + uniqueChars[i]).substring(2));
+        System.out.println("--------");
+
+        short to = (short) uniqueChars[uniqueChars.length - 2];
+        short from = (short) uniqueChars[0];
+        int toInt = to >= 0 ? to : 0x10000 + to;
+        int fromInt = from >= 0 ? from : 0x10000 + from;
+
+        System.out.println("to: " + toInt);
+        System.out.println("from: " + fromInt);
+
+        System.out.println("len: " + (uniqueChars[uniqueChars.length - 1] - uniqueChars[0] + 1));
+
         short[] charToIndex = new short[
-            uniqueChars[uniqueChars.length - 1] - uniqueChars[0] + 1
+            toInt - fromInt + 1
         ];
 
         for (int i = 0; i < uniqueChars.length; ++i)
         {
-            charToIndex[uniqueChars [i] - uniqueChars[0]] = (short) (i + 1);
+            short curcur = (short) uniqueChars[i];
+            int cur = curcur >= 0 ? curcur : 0x10000 + curcur;
+            charToIndex[cur - fromInt] = (short) (i + 1);
         }
 
         return charToIndex;
@@ -280,12 +299,34 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
             throws IOException {
         int len = reader.readInt();
 
+        System.out.println("len: " + len);
+
         T[] result = (T[]) new Object[len];
         int i = 0;
         for (T t: readSequence(reader, read)) {
             result[i] = t;
             i++;
-            if (i <= len) break;
+            System.out.println("read array payload num: " + i);
+            if (i == len) break;
+        }
+
+        return result;
+    }
+
+    public static Character[] readCharArray(MReader reader,
+                                    Function<MReader, Character> read)
+        throws IOException {
+        int len = reader.readInt();
+
+        System.out.println("len: " + len);
+
+        Character[] result = new Character[len];
+        int i = 0;
+        for (Character t: readSequence(reader, read)) {
+            result[i] = t;
+            i++;
+            System.out.println("read char array payload num: " + i);
+            if (i == len) break;
         }
 
         return result;
