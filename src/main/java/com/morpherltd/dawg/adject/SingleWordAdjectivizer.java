@@ -1,25 +1,39 @@
 package com.morpherltd.dawg.adject;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.morpherltd.dawg.Dawg;
 import com.morpherltd.dawg.DawgExtensions;
+import com.morpherltd.dawg.DawgStatic;
+import com.morpherltd.dawg.helpers.StrHelper;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 public class SingleWordAdjectivizer {
-    private final Dawg <DictionaryPayloadCollection> dictionary;
-    private final Dawg<Boolean> reverseDictionary;
-    private final HashMap<DictionaryPayload, Integer> payloadRanks;
+    private Dawg <DictionaryPayloadCollection> dictionary;
+    private Dawg<Boolean> reverseDictionary;
+    private HashMap<DictionaryPayload, Integer> payloadRanks;
 
-//    public SingleWordAdjectivizer () : this (Dawg<DictionaryPayloadCollection>.Load (new MemoryStream (Resources.Dictionary), DictionaryPayloadCollection.Read))
-//    {
-//    }
+    public SingleWordAdjectivizer () throws IOException {
+        InputStream stream = getClass().getClassLoader()
+            .getResourceAsStream("Dictionary.dawg");
+        init(new DawgStatic<DictionaryPayloadCollection>().load(new DataInputStream(stream), r -> {
+            try {
+                return DictionaryPayloadCollection.read(r);
+            } catch (IOException e) { throw new RuntimeException(e); }
+        }));
+    }
 
-    public SingleWordAdjectivizer (Dawg<DictionaryPayloadCollection> dictionary)
-    {
+    public SingleWordAdjectivizer (Dawg<DictionaryPayloadCollection> dictionary) {
+        init(dictionary);
+    }
+
+    public void init(Dawg<DictionaryPayloadCollection> dictionary) {
         this.dictionary = dictionary;
-
         reverseDictionary = DawgExtensions.toDawg(dictionary, e -> Lists.charactersOf(new StringBuilder(e.getKey()).reverse().toString()), e -> true, Boolean.class);
 
         payloadRanks = new HashMap<>();
@@ -34,69 +48,84 @@ public class SingleWordAdjectivizer {
         }
     }
 
-    public IEnumerable <string> GetAdjectives (string noun)
-    {
-        var lcNoun = noun.ToLowerInvariant ();
+    public Iterable<String> getAdjectives(String noun)
+            throws IllegalAccessException, InstantiationException {
+        String lcNoun = noun.toLowerCase(Locale.ROOT);
 
-        IEnumerable<DictionaryPayload> payloads = dictionary [lcNoun];
+        Iterable<DictionaryPayload> payloads =
+            dictionary.get(Lists.charactersOf(lcNoun)).GetEnumerator();
 
         if (payloads == null)
         {
-            int suffixLength = reverseDictionary.GetLongestCommonPrefixLength (lcNoun.Reverse ());
+            String lcNounReversed = new StringBuilder(lcNoun).reverse().toString();
+            int suffixLength = reverseDictionary.getLongestCommonPrefixLength(
+                Lists.charactersOf(lcNounReversed)
+            );
 
             do
             {
                 int currentSuffixLength = suffixLength;
 
-                payloads = reverseDictionary
-                    .MatchPrefix (lcNoun.Reverse ().Take (suffixLength)) // select all dictionary words with given suffix
-                    .Select (re => new {Noun = new string (re.Key.Reverse ().ToArray ()), Payloads = dictionary [re.Key.Reverse ()]})
-                        .SelectMany (r => r.Payloads.Select (p => new {r.Noun, Payload = p}))
-                        .Where (r => CanBeApplied (r.Noun, lcNoun, currentSuffixLength))
-                        .Select (r => r.Payload)
-                        .Distinct ()
-                .Where (p => p.NounSuffix.Length <= currentSuffixLength)
-                //.Where (p => payloadRanks [p] > 1)
-                        .OrderByDescending (p => payloadRanks [p])
-                        .ToArray ();
+                HashSet<DictionaryPayload> distinct = new HashSet<>();
 
-                if (payloads.Any())
+                String suf = lcNounReversed.substring(0, suffixLength);
+                Iterable<Map.Entry<String, Boolean>> matched =
+                    reverseDictionary.matchPrefix(Lists.charactersOf(suf));
+                for (Map.Entry<String, Boolean> tpl: matched) {
+                    String n = StrHelper.reverse(tpl.getKey());
+                    DictionaryPayloadCollection pc = dictionary.get(Lists.charactersOf(n));
+                    for (DictionaryPayload p: pc.GetEnumerator()) {
+                        if (canBeApplied(n, lcNoun, currentSuffixLength)) {
+                            if (p.NounSuffix.length() <= currentSuffixLength) {
+                                distinct.add(p);
+                            }
+                        }
+                    }
+                }
+
+                DictionaryPayload[] payloadsDescending = (DictionaryPayload[])
+                    distinct.stream().sorted(
+                        (p1, p2) -> -(payloadRanks.get(p2) - payloadRanks.get(p1))
+                    ).<DictionaryPayload>toArray();
+
+                if (payloadsDescending.length > 0)
                     break;
             }
             while (--suffixLength >= 0);
         }
 
-        return payloads.Select (p => GetAdjective (lcNoun, p).Replace(' ', '-'));
+        ArrayList<String> result = new ArrayList<>();
+        for (DictionaryPayload p : payloads) {
+            result.add(getAdjective(lcNoun, p).replace(' ', '-'));
+        }
+        return result;
     }
 
-    static bool CanBeApplied(string dictionaryNoun, string noun, int suffixLength)
+    static boolean canBeApplied(String dictionaryNoun, String noun, int suffixLength)
     {
-        var canBeApplied = noun.Length > suffixLength && dictionaryNoun.Length > suffixLength
-            && Category (suffixLength, noun).Equals (Category (suffixLength, dictionaryNoun));
+        boolean canBeApplied = noun.length() > suffixLength && dictionaryNoun.length() > suffixLength
+            && category (suffixLength, noun).equals(category (suffixLength, dictionaryNoun));
 
         return canBeApplied;
     }
 
-    private static object Category (int suffixLength, string noun)
-    {
-        var category = Category (noun.Reverse ().Skip (suffixLength).First ());
+    private static Object category (int suffixLength, String noun) {
+        Object category = category(StrHelper.reverse(noun).substring(suffixLength, 1).charAt(0));
 
         return category;
     }
 
-    private static object Category(char c)
-    {
-            const string s = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
-            const string p = "аббкбаашбабббббаббббабкбшшшбабааа";
+    private static Object category(char c) {
+        String s = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+        String p = "аббкбаашбабббббаббббабкбшшшбабааа";
 
-        int i = s.IndexOf (c);
+        int i = s.indexOf (c);
 
-        return i == -1 ? ' ' : p [i];
+        return i == -1 ? ' ' : p.charAt(i);
     }
 
-    private static string GetAdjective (string lcNoun, DictionaryPayload p)
-    {
-        return lcNoun.Substring (0, lcNoun.Length - p.NounSuffix.Length) + p.AdjvSuffix;
+    private static String getAdjective(String lcNoun, DictionaryPayload p) {
+        return lcNoun.substring (0, lcNoun.length() - p.NounSuffix.length()) + p.AdjvSuffix;
     }
 
 }

@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -39,7 +40,7 @@ public class DawgBuilderTests extends TestCase {
         throws IllegalAccessException, InstantiationException {
         String[] fruit = new String[]{"apple", "banana", "orange"};
 
-        Dawg<Boolean> dawg = DawgExtensions.<Boolean>toDawg(fruit, f -> Lists.charactersOf(f), f -> true, Boolean.class);
+        Dawg<Boolean> dawg = DawgExtensions.toDawg(Arrays.asList(fruit), f -> Lists.charactersOf(f), f -> true, Boolean.class);
 
         assertTrue(dawg.get(Lists.charactersOf("apple")));
         assertTrue(dawg.get(Lists.charactersOf("banana")));

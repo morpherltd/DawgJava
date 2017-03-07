@@ -1,12 +1,15 @@
 package com.morpherltd.dawg.adject;
 
-/**
- * Created by rok on 06-Mar-17.
- */
+import java.io.IOException;
+
 public class Adjectivizer {
     final SingleWordAdjectivizer singleWordAdjectivizer = new SingleWordAdjectivizer ();
 
-    public Iterable<String> getAdjectives(String phrase) {
+    public Adjectivizer() throws IOException {
+    }
+
+    public Iterable<String> getAdjectives(String phrase)
+            throws InstantiationException, IllegalAccessException {
         String noun = WordJoiner.toLowerAndJoinWords(phrase);
 
         return singleWordAdjectivizer.getAdjectives(noun);
