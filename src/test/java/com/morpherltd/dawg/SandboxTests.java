@@ -8,6 +8,9 @@ public class Sandbox extends TestCase {
     private final Adjectivizer adjectivizer = new Adjectivizer();
 
     public void testEmptyString() {
-        assertEquals(0, adjectivizer.getAdjectives("").Count());
+        assertEquals(
+            0,
+            adjectivizer.getAdjectives("").spliterator().getExactSizeIfKnown()
+        );
     }
 }

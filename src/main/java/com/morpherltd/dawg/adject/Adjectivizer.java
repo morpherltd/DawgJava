@@ -6,9 +6,8 @@ package com.morpherltd.dawg.adject;
 public class Adjectivizer {
     final SingleWordAdjectivizer singleWordAdjectivizer = new SingleWordAdjectivizer ();
 
-    public Iterable<String> getAdjectives(String phrase)
-    {
-        String noun = WordJoiner.ToLowerAndJoinWords(phrase);
+    public Iterable<String> getAdjectives(String phrase) {
+        String noun = WordJoiner.toLowerAndJoinWords(phrase);
 
         return singleWordAdjectivizer.getAdjectives(noun);
     }

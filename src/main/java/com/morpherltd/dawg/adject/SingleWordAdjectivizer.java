@@ -1,26 +1,37 @@
 package com.morpherltd.dawg.adject;
 
+import com.google.common.collect.Lists;
 import com.morpherltd.dawg.Dawg;
+import com.morpherltd.dawg.DawgExtensions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SingleWordAdjectivizer {
     private final Dawg <DictionaryPayloadCollection> dictionary;
     private final Dawg<Boolean> reverseDictionary;
-    private final Dictionary <DictionaryPayload, int> payloadRanks;
+    private final HashMap<DictionaryPayload, Integer> payloadRanks;
 
-    public SingleWordAdjectivizer () : this (Dawg<DictionaryPayloadCollection>.Load (new MemoryStream (Resources.Dictionary), DictionaryPayloadCollection.Read))
-    {
-    }
+//    public SingleWordAdjectivizer () : this (Dawg<DictionaryPayloadCollection>.Load (new MemoryStream (Resources.Dictionary), DictionaryPayloadCollection.Read))
+//    {
+//    }
 
-    public SingleWordAdjectivizer (Dawg <DictionaryPayloadCollection> dictionary)
+    public SingleWordAdjectivizer (Dawg<DictionaryPayloadCollection> dictionary)
     {
         this.dictionary = dictionary;
 
-        reverseDictionary = dictionary.ToDawg (e => e.Key.Reverse (), e => true);
+        reverseDictionary = DawgExtensions.toDawg(dictionary, e -> Lists.charactersOf(new StringBuilder(e.getKey()).reverse().toString()), e -> true, Boolean.class);
 
-        payloadRanks = dictionary
-            .SelectMany (e => e.Value)
-                .GroupBy (p => p)
-                .ToDictionary (g => g.Key, g => g.Count ());
+        payloadRanks = new HashMap<>();
+        while (dictionary.iterator().hasNext()) {
+            DictionaryPayloadCollection c = dictionary.iterator().next().getValue();
+            for (DictionaryPayload payload: c.GetEnumerator()) {
+                if (!payloadRanks.containsKey(payload))
+                    payloadRanks.put(payload, 1);
+                else
+                    payloadRanks.put(payload, payloadRanks.get(payload) + 1);
+            }
+        }
     }
 
     public IEnumerable <string> GetAdjectives (string noun)

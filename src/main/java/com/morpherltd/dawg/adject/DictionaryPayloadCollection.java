@@ -1,26 +1,35 @@
 package com.morpherltd.dawg.adject;
 
+import com.google.common.collect.Iterables;
+import com.morpherltd.dawg.helpers.DataStreamStrings;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DictionaryPayloadCollection {
     private final DictionaryPayload[] payloads;
 
     public DictionaryPayloadCollection (Iterable<DictionaryPayload> payloads) {
-        this.payloads = payloads.toArray ();
+        this.payloads = Iterables.toArray(payloads, DictionaryPayload.class);
     }
 
     @Override
     public boolean equals(Object obj) {
         DictionaryPayloadCollection that = (DictionaryPayloadCollection) obj;
 
-        return this.payloads.SequenceEqual (that.payloads);
+        return this.payloads.equals(that.payloads);
     }
 
     @Override
     public int hashCode() {
-        return payloads.Aggregate (0, (hc, p) => hc ^ p.GetHashCode ());
+        int hc = 0;
+        for (int i = 0; i < payloads.length; i++) {
+            hc ^= payloads.hashCode();
+        }
+        return hc;
     }
 
     public DictionaryPayload get(int i) {
@@ -30,16 +39,16 @@ public class DictionaryPayloadCollection {
     public static void write(DataOutputStream w, DictionaryPayloadCollection pc) throws IOException {
         if (pc == null)
         {
-            w.write(0);
+            w.writeInt(0);
         }
         else
         {
-            w.write(pc.payloads.length);
+            w.writeInt(pc.payloads.length);
 
             for (DictionaryPayload payload : pc.payloads)
             {
-                w.write(payload.NounSuffix);
-                w.write(payload.AdjvSuffix);
+                DataStreamStrings.writeString(w, payload.NounSuffix);
+                DataStreamStrings.writeString(w, payload.AdjvSuffix);
             }
         }
     }
@@ -48,16 +57,21 @@ public class DictionaryPayloadCollection {
             throws IOException {
         int length = r.readInt();
 
-        new DictionaryPayload();
-
-        return length == 0 ? null : new DictionaryPayloadCollection (
-            Enumerable.Range (0, length)
-                .Select (i => new DictionaryPayload {
-            NounSuffix = r.ReadString (),
-            AdjvSuffix = r.ReadString ()}));
+        if (length == 0) {
+            return null;
+        } else {
+            ArrayList<DictionaryPayload> arr = new ArrayList<>();
+            for (int i = 0; i < length; i++) {  // TODO: Possible bug in the orig code? < or <= ?
+                DictionaryPayload dp = new DictionaryPayload();
+                dp.NounSuffix = DataStreamStrings.readString(r);
+                dp.AdjvSuffix = DataStreamStrings.readString(r);
+                arr.add(dp);
+            }
+            return new DictionaryPayloadCollection(arr);
+        }
     }
 
     Iterable<DictionaryPayload> GetEnumerator() {
-        return this.payloads.iterator();
+        return Arrays.asList(this.payloads);
     }
 }
