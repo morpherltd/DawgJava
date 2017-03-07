@@ -3,7 +3,7 @@ package com.morpherltd.dawg.adject;
 import java.io.IOException;
 
 public class Adjectivizer {
-    final SingleWordAdjectivizer singleWordAdjectivizer = new SingleWordAdjectivizer ();
+    final SingleWordAdjectivizer singleWordAdjectivizer = new SingleWordAdjectivizer();
 
     public Adjectivizer() throws IOException {
     }

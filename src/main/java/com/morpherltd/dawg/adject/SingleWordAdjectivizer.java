@@ -6,11 +6,12 @@ import com.google.common.collect.Lists;
 import com.morpherltd.dawg.Dawg;
 import com.morpherltd.dawg.DawgExtensions;
 import com.morpherltd.dawg.DawgStatic;
+import com.morpherltd.dawg.helpers.MReader;
 import com.morpherltd.dawg.helpers.StrHelper;
+import org.apache.commons.io.FileUtils;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URL;
 import java.util.*;
 
 public class SingleWordAdjectivizer {
@@ -19,12 +20,13 @@ public class SingleWordAdjectivizer {
     private HashMap<DictionaryPayload, Integer> payloadRanks;
 
     public SingleWordAdjectivizer () throws IOException {
-        InputStream stream = getClass().getClassLoader()
-            .getResourceAsStream("Dictionary.dawg");
-        init(new DawgStatic<DictionaryPayloadCollection>().load(new DataInputStream(stream), r -> {
-            try {
-                return DictionaryPayloadCollection.read(r);
-            } catch (IOException e) { throw new RuntimeException(e); }
+        MReader byteArrayInputStream = new MReader("Dictionary.dawg");
+        init(new DawgStatic<DictionaryPayloadCollection>(DictionaryPayloadCollection.class).load(byteArrayInputStream, r -> {
+                try {
+                    return DictionaryPayloadCollection.read(r);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
         }));
     }
 

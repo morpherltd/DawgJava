@@ -2,10 +2,11 @@ package com.morpherltd.dawg.adject;
 
 import com.google.common.collect.Iterables;
 import com.morpherltd.dawg.helpers.DataStreamStrings;
+import com.morpherltd.dawg.helpers.MReader;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -53,7 +54,7 @@ public class DictionaryPayloadCollection {
         }
     }
 
-    public static DictionaryPayloadCollection read(DataInputStream r)
+    public static DictionaryPayloadCollection read(MReader r)
             throws IOException {
         int length = r.readInt();
 
@@ -63,8 +64,8 @@ public class DictionaryPayloadCollection {
             ArrayList<DictionaryPayload> arr = new ArrayList<>();
             for (int i = 0; i < length; i++) {  // TODO: Possible bug in the orig code? < or <= ?
                 DictionaryPayload dp = new DictionaryPayload();
-                dp.NounSuffix = DataStreamStrings.readString(r);
-                dp.AdjvSuffix = DataStreamStrings.readString(r);
+//                dp.NounSuffix = DataStreamStrings.readString(r);
+//                dp.AdjvSuffix = DataStreamStrings.readString(r);
                 arr.add(dp);
             }
             return new DictionaryPayloadCollection(arr);

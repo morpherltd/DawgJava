@@ -1,8 +1,8 @@
 package com.morpherltd.dawg;
 
+import com.morpherltd.dawg.helpers.MReader;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -182,7 +182,7 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
     }
 
     // Todo: first is DataInputStream?
-    public void SaveAsOldDawg (DataInputStream stream,
+    public void SaveAsOldDawg (MReader stream,
                                BiConsumer<DataOutputStream, TPayload>
                                    writePayload) {
         throw new NotImplementedException();
@@ -202,8 +202,8 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
     private final char firstChar;
     private final char lastChar;
 
-    public MatrixDawg (DataInputStream reader,
-                       Function<DataInputStream, TPayload> readPayload,
+    public MatrixDawg (MReader reader,
+                       Function<MReader, TPayload> readPayload,
                        Class<TPayload> c)
             throws IOException {
         cls = c;
@@ -215,10 +215,10 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
 
         payloads = readArray(reader, readPayload);
 
-        Character[] tmpChars = readArray(reader, (DataInputStream r) -> {
+        Character[] tmpChars = readArray(reader, (MReader r) -> {
             try {
-                return r.readChar();
-            } catch (IOException e) {
+                return reader.readChar();
+            } catch (Exception e) {
                 throw new RuntimeException(e.getMessage());
             }
         });
@@ -248,7 +248,7 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
         return charToIndex;
     }
 
-    private static <TPayload> int[][] readChildren(DataInputStream reader,
+    private static <TPayload> int[][] readChildren(MReader reader,
                                         char[] indexToChar) throws IOException {
         int nodeCount = reader.readInt();
 
@@ -275,8 +275,8 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
     }
 
 
-    public static <T> T[] readArray(DataInputStream reader,
-                                    Function<DataInputStream, T> read)
+    public static <T> T[] readArray(MReader reader,
+                                    Function<MReader, T> read)
             throws IOException {
         int len = reader.readInt();
 
@@ -291,8 +291,8 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
         return result;
     }
 
-    static <T> Iterable<T> readSequence(DataInputStream reader,
-                                        Function<DataInputStream, T> read)
+    static <T> Iterable<T> readSequence(MReader reader,
+                                        Function<MReader, T> read)
     {
         return () -> new Iterator<T>() {
             @Override

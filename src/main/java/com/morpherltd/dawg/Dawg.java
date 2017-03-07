@@ -1,5 +1,7 @@
 package com.morpherltd.dawg;
 
+import com.morpherltd.dawg.helpers.MReader;
+
 import java.io.*;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
@@ -47,37 +49,50 @@ public class Dawg<TPayload> implements Iterable<Map.Entry<String, TPayload>> {
             try { r.writeFloat(payload); } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
         });
 
-        Readers.put(Boolean.class, (Function<DataInputStream, Boolean>) (r) -> {
-            try { return r.readBoolean(); } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
-        });
-        Readers.put(Integer.class, (Function<DataInputStream, Integer>) (r) -> {
-            try { return r.readInt(); } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
-        });
-        Readers.put(Long.class, (Function<DataInputStream, Long>) (r) -> {
-            try { return r.readLong(); } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
-        });
-        Readers.put(Byte.class, (Function<DataInputStream, Byte>) (r) -> {
-            try { return r.readByte(); } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
-        });
-        Readers.put(Short.class, (Function<DataInputStream, Short>) (r) -> {
-            try { return r.readShort(); } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
-        });
-        Readers.put(String.class, (Function<DataInputStream, String>) (r) -> {
+        Readers.put(Boolean.class, (Function<MReader, Boolean>) (r) -> {
             try {
-                int length=r.readInt();
-                byte[] data=new byte[length];
-                r.readFully(data);
-                return new String(data,"UTF-8");
-            } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
+                return r.readBoolean();
+            } catch (IOException e) { throw new RuntimeException(e); }
         });
-        Readers.put(Character.class, (Function<DataInputStream, Character>) (r) -> {
-            try { return r.readChar(); } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
+        Readers.put(Integer.class, (Function<MReader, Integer>) (r) -> {
+            try {
+                return r.readInt();
+            } catch (IOException e) { throw new RuntimeException(e); }
         });
-        Readers.put(Double.class, (Function<DataInputStream, Double>) (r) -> {
-            try { return r.readDouble(); } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
+        Readers.put(Long.class, (Function<MReader, Long>) (r) -> {
+            try {
+                return r.readLong();
+            } catch (IOException e) { throw new RuntimeException(e); }
         });
-        Readers.put(Float.class, (Function<DataInputStream, Float>) (r) -> {
-            try { return r.readFloat(); } catch (IOException e) { throw new RuntimeException(e.getMessage()); }
+        Readers.put(Byte.class, (Function<MReader, Byte>) (r) -> {
+            try {
+                return r.readByte();
+            } catch (IOException e) { throw new RuntimeException(e); }
+        });
+        Readers.put(Short.class, (Function<MReader, Short>) (r) -> {
+            try {
+                return r.readShort();
+            } catch (IOException e) { throw new RuntimeException(e); }
+        });
+        Readers.put(String.class, (Function<MReader, String>) (r) -> {
+            try {
+                return r.readString();
+            } catch (IOException e) { throw new RuntimeException(e); }
+        });
+        Readers.put(Character.class, (Function<MReader, Character>) (r) -> {
+            try {
+                return r.readChar();
+            } catch (IOException e) { throw new RuntimeException(e); }
+        });
+        Readers.put(Double.class, (Function<MReader, Double>) (r) -> {
+            try {
+                return r.readDouble();
+            } catch (IOException e) { throw new RuntimeException(e); }
+        });
+        Readers.put(Float.class, (Function<MReader, Float>) (r) -> {
+            try {
+                return r.readFloat();
+            } catch (IOException e) { throw new RuntimeException(e); }
         });
     }
 
@@ -154,7 +169,7 @@ public class Dawg<TPayload> implements Iterable<Map.Entry<String, TPayload>> {
         // Do not close the BinaryWriter. Users might want to append more data to the stream.
         DataOutputStream writer = new DataOutputStream(stream);
 
-        writer.write(new DawgStatic().getSignature());
+        writer.write(new DawgStatic(cls).getSignature());
 
         pSave.accept((OldDawg<TPayload>) dawg, writer);
     }

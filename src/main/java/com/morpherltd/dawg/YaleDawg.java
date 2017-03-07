@@ -1,6 +1,7 @@
 package com.morpherltd.dawg;
 
-import java.io.DataInputStream;
+import com.morpherltd.dawg.helpers.MReader;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
@@ -11,8 +12,7 @@ import static com.morpherltd.dawg.MatrixDawg.readArray;
 public class YaleDawg<TPayload> implements IDawg<TPayload> {
     private final Class<TPayload> cls;
 
-    class Child
-    {
+    class Child {
         public final int Index;
         public final short CharIndex;
 
@@ -32,8 +32,8 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
     private final int [] firstChildForNode;
     private final Child [] children; // size = NNZ
 
-    public YaleDawg (DataInputStream reader,
-                     Function<DataInputStream, TPayload> readPayload,
+    public YaleDawg (MReader reader,
+                     Function<MReader, TPayload> readPayload,
                      Class<TPayload> c)
             throws IOException {
         cls = c;
@@ -45,12 +45,10 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
 
         payloads = MatrixDawg.<TPayload>readArray(reader, readPayload);
 
-        Character[] tmpChars = MatrixDawg.<Character>readArray(reader, (DataInputStream r) -> {
+        Character[] tmpChars = MatrixDawg.<Character>readArray(reader, (MReader r) -> {
             try {
                 return r.readChar();
-            } catch (IOException e) {
-                throw new RuntimeException(e.getMessage());
-            }
+            } catch (IOException e) { throw new RuntimeException(e); }
         });
         indexToChar = tmpChars.toString().toCharArray();
 
@@ -87,7 +85,7 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
         lastChar = indexToChar[indexToChar.length - 1];
     }
 
-    static short readInt(DataInputStream reader, int countOfPossibleValues)
+    static short readInt(MReader reader, int countOfPossibleValues)
             throws IOException {
         return countOfPossibleValues > 256 ? reader.readShort() : reader.readByte();
     }

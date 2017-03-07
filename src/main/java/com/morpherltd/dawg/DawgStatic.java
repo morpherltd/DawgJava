@@ -1,6 +1,7 @@
 package com.morpherltd.dawg;
 
-import java.io.DataInputStream;
+import com.morpherltd.dawg.helpers.MReader;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.ParameterizedType;
@@ -11,27 +12,25 @@ import static com.morpherltd.dawg.Dawg.Readers;
 public class DawgStatic<TPayload> {
     private final Class<TPayload> cls;
 
-    public DawgStatic() {
-        this.cls = (Class<TPayload>)
-            ((ParameterizedType)getClass()
-                .getGenericSuperclass())
-                .getActualTypeArguments()[0];
+    public DawgStatic(Class<TPayload> cls) {
+        this.cls = cls;
     }
 
-    public Dawg<TPayload> load(DataInputStream stream, Function<DataInputStream, TPayload> readPayload) throws IOException { // TODO: ok if not static?
-        Function<DataInputStream, TPayload> f = readPayload != null ? readPayload : (Function<DataInputStream, TPayload>) Readers.get(cls);
+    public Dawg<TPayload> load(MReader stream, Function<MReader, TPayload> readPayload) throws IOException { // TODO: ok if not static?
+        Function<MReader, TPayload> f = readPayload != null ? readPayload : (Function<MReader, TPayload>) Readers.get(cls);
         return new Dawg<TPayload>(loadIDawg(stream, f), cls);
     }
 
-    private IDawg<TPayload> loadIDawg(DataInputStream stream,
-                                      Function<DataInputStream, TPayload>
+    private IDawg<TPayload> loadIDawg(MReader reader,
+                                      Function<MReader, TPayload>
                                           readPayload) throws IOException {
-        DataInputStream reader = new DataInputStream(stream);
         int signature = getSignature();
         int firstInt = reader.readInt();
 
         if (firstInt == signature) {
             int version = reader.readInt();
+
+            System.out.println("version: " + version);
 
             switch (version)
             {
@@ -60,8 +59,8 @@ public class DawgStatic<TPayload> {
             + bytes [3] << 24;
     }
 
-    private OldDawg loadOldDawg(DataInputStream reader,
-                                int nodeCount, Function<DataInputStream, TPayload> readPayload)
+    private OldDawg loadOldDawg(MReader reader,
+                                int nodeCount, Function<MReader, TPayload> readPayload)
         throws IOException {
         Node<TPayload>[] nodes = (Node<TPayload>[]) new Object[nodeCount];
 
