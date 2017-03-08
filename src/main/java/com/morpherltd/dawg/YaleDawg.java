@@ -40,9 +40,9 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
         final boolean[] ja = {true};
         Character[] tmpChars = MatrixDawg.readCharArray(reader, (MReader r) -> {
             try {
-                if (ja[0])
-                    r.readByte();
-                ja[0] = false;
+//                if (ja[0])
+//                    r.readByte();
+//                ja[0] = false;
 
 
                 char ch = r.readChar();
