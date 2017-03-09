@@ -40,9 +40,9 @@ public class JoinWords extends TestCase {
         Test("Набережные Челны", "набережночелны");
     }
 
-//    public void test9 () {
-//        Test("Северная Африка", "североафрика");
-//    }
+    public void test9 () {
+        Test("Северная Африка", "североафрика");
+    }
 
     private static void Test (String noun, String oneWord)
     {

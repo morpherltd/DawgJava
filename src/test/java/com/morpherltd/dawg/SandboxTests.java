@@ -119,13 +119,13 @@ public class SandboxTests extends TestCase {
         );
     }
 
-//    public void test13()
-//        throws IllegalAccessException, InstantiationException {
-//        assertEquals(
-//            "старооскольский",
-//            adjectivizer.getAdjectives ("Старый Оскол").iterator().next()
-//        );
-//    }
+    public void test13()
+        throws IllegalAccessException, InstantiationException {
+        assertEquals(
+            "старооскольский",
+            adjectivizer.getAdjectives ("Старый Оскол").iterator().next()
+        );
+    }
 
     public void test14()
         throws IllegalAccessException, InstantiationException {
@@ -215,13 +215,13 @@ public class SandboxTests extends TestCase {
         );
     }
 
-//    public void test25()
-//        throws IllegalAccessException, InstantiationException {
-//        assertEquals(
-//            "Тыкапува",
-//            adjectivizer.getAdjectives ("тыкапуовский").iterator().next()
-//        );
-//    }
+    public void test25()
+        throws IllegalAccessException, InstantiationException {
+        assertEquals(
+            "Тыкапува",
+            adjectivizer.getAdjectives ("тыкапуовский").iterator().next()
+        );
+    }
 
     public void test26()
         throws IllegalAccessException, InstantiationException {
@@ -231,13 +231,13 @@ public class SandboxTests extends TestCase {
         );
     }
 
-//    public void test27()
-//        throws IllegalAccessException, InstantiationException {
-//        assertEquals(
-//            "русский",
-//            adjectivizer.getAdjectives ("Русская").iterator().next()
-//        );
-//    }
+    public void test27()
+        throws IllegalAccessException, InstantiationException {
+        assertEquals(
+            "русский",
+            adjectivizer.getAdjectives ("Русская").iterator().next()
+        );
+    }
 
     public void test28()
         throws IllegalAccessException, InstantiationException {
@@ -255,13 +255,13 @@ public class SandboxTests extends TestCase {
         );
     }
 
-//    public void test30()
-//        throws IllegalAccessException, InstantiationException {
-//        assertEquals(
-//            "щербиновский",
-//            adjectivizer.getAdjectives ("Щербиновская").iterator().next()
-//        );
-//    }
+    public void test30()
+        throws IllegalAccessException, InstantiationException {
+        assertEquals(
+            "щербиновский",
+            adjectivizer.getAdjectives ("Щербиновская").iterator().next()
+        );
+    }
 
     public void testTwoWords()
         throws IllegalAccessException, InstantiationException {
@@ -284,21 +284,21 @@ public class SandboxTests extends TestCase {
         );
     }
 
-//    public void test34()
-//        throws IllegalAccessException, InstantiationException {
-//        assertEquals(
-//            "корейский",
-//            adjectivizer.getAdjectives ("Республика Корея").iterator().next()
-//        );
-//    }
+    public void test34()
+        throws IllegalAccessException, InstantiationException {
+        assertEquals(
+            "корейский",
+            adjectivizer.getAdjectives ("Республика Корея").iterator().next()
+        );
+    }
 
-//    public void test35()
-//        throws IllegalAccessException, InstantiationException {
-//        assertEquals(
-//            "российский",
-//            adjectivizer.getAdjectives ("Российская Федерация").iterator().next()
-//        );
-//    }
+    public void test35()
+        throws IllegalAccessException, InstantiationException {
+        assertEquals(
+            "российский",
+            adjectivizer.getAdjectives ("Российская Федерация").iterator().next()
+        );
+    }
 
     public void test36()
         throws IllegalAccessException, InstantiationException {

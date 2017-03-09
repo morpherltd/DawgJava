@@ -45,7 +45,7 @@ public class WordJoiner {
 
                 String first = StringExtensions.removeLast(split.get(0), n).replace('ё', 'е');
 
-                if (first == "северн") first = "север"; // Северная Африка - североафриканский (-н- исчезает)
+                if (first.equals("северн")) first = "север"; // Северная Африка - североафриканский (-н- исчезает)
 
                 char last = StringExtensions.last(first, 1).charAt(0);
 
