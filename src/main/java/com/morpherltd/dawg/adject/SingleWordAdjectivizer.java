@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.morpherltd.dawg.Dawg;
+import com.morpherltd.dawg.DawgBuilder;
 import com.morpherltd.dawg.DawgExtensions;
 import com.morpherltd.dawg.DawgStatic;
 import com.morpherltd.dawg.helpers.MReader;
@@ -36,12 +37,34 @@ public class SingleWordAdjectivizer {
 
     public void init(Dawg<DictionaryPayloadCollection> dictionary) {
         this.dictionary = dictionary;
+        Iterator<Map.Entry<String, DictionaryPayloadCollection>> it = dictionary.iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, DictionaryPayloadCollection> next = it.next();
+            System.out.println("dict key: " + next.getKey());
+//            System.out.println("dict key: " + next.getKey() + " " + next.getValue().GetEnumerator().iterator().next().NounSuffix);
+        }
+
         reverseDictionary = DawgExtensions.toDawg(dictionary, e -> Lists.charactersOf(new StringBuilder(e.getKey()).reverse().toString()), e -> true, Boolean.class);
+//        DawgBuilder<Boolean> dawgBuilder = new DawgBuilder(Boolean.class);
+//        for (Map.Entry<String, DictionaryPayloadCollection> elem : dictionary) {
+//            System.out.println("key: " + elem.getKey());
+//            dawgBuilder.insert(
+//                Lists.charactersOf(new StringBuilder(elem.getKey()).reverse().toString()),
+//                true
+//            );
+//        }
+
+//        System.out.println("buildDawg");
+//        reverseDictionary = dawgBuilder.buildDawg();
+//        System.out.println("finishedBuildDawg");
 
         payloadRanks = new HashMap<>();
         while (dictionary.iterator().hasNext()) {
+            System.out.println("dict key: " + dictionary.iterator().next().getKey());
             DictionaryPayloadCollection c = dictionary.iterator().next().getValue();
             for (DictionaryPayload payload: c.GetEnumerator()) {
+                System.out.println(payload.NounSuffix);
+                System.out.println(payload.AdjvSuffix);
                 if (!payloadRanks.containsKey(payload))
                     payloadRanks.put(payload, 1);
                 else

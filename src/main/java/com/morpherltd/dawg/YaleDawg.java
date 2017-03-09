@@ -1,5 +1,7 @@
 package com.morpherltd.dawg;
 
+import com.google.common.base.Joiner;
+import com.infomancers.collections.yield.Yielder;
 import com.morpherltd.dawg.helpers.BinaryUtil;
 import com.morpherltd.dawg.helpers.MReader;
 
@@ -140,7 +142,7 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
 
     private TPayload getPayload(int node_i)
         throws IllegalAccessException, InstantiationException {
-        return node_i < payloads.length ? payloads [node_i] : cls.newInstance();
+        return node_i < payloads.length ? payloads [node_i] : NewInstance.make(cls);
     }
 
     ArrayList<Integer> getPath (Iterable<Character> word) {
@@ -212,7 +214,7 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
 
     @Override
     public Iterable<Map.Entry<String, TPayload>> matchPrefix(final Iterable<Character> prefix) throws IllegalAccessException, InstantiationException {
-        String prefixStr = prefix.toString();
+        String prefixStr = Joiner.on("").join(prefix);
 
         ArrayList<Integer> p = getPath(prefix);
         int node_i = p.get(p.size() - 1);
@@ -223,42 +225,55 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
     }
 
 
-    private ArrayList<Map.Entry<String, TPayload>> matchPrefix (
+    private Iterable<Map.Entry<String, TPayload>> matchPrefix (
             StringBuilder sb, int node_i)
             throws IllegalAccessException, InstantiationException {
         ArrayList<Map.Entry<String, TPayload>> result = new ArrayList<>();
 
-        if (node_i != -1)
-        {
-            TPayload payload = getPayload(node_i);
-
-            if (!payload.equals(cls.newInstance()))
-            {
-                result.add(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
-            }
-
-            int firstChild_i = firstChildForNode [node_i];
-
-            int lastChild_i = node_i + 1 < nodeCount
-                ? firstChildForNode[node_i + 1]
-                : children.length;
-
-            for (int i = firstChild_i; i < lastChild_i; ++i)
-            {
-                Child child = children [i];
-
-                sb.append(indexToChar [child.CharIndex]);
-
-                for (Map.Entry<String, TPayload> pair
-                    : matchPrefix (sb, child.Index))
+        return new Yielder<Map.Entry<String, TPayload>>() {
+            @Override protected void yieldNextCore() {
+                if (node_i != -1)
                 {
-                    result.add(pair);
-                }
+                    TPayload payload = null;
+                    try {
+                        payload = getPayload(node_i);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
 
-                sb.setLength(sb.length() - 1);
+                    if (!payload.equals(NewInstance.make(cls)))
+                    {
+                        result.add(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
+                    }
+
+                    int firstChild_i = firstChildForNode [node_i];
+
+                    int lastChild_i = node_i + 1 < nodeCount
+                        ? firstChildForNode[node_i + 1]
+                        : children.length;
+
+                    for (int i = firstChild_i; i < lastChild_i; ++i)
+                    {
+                        Child child = children [i];
+
+                        sb.append(indexToChar [child.CharIndex]);
+
+                        try {
+                            for (Map.Entry<String, TPayload> pair
+                                : matchPrefix (sb, child.Index))
+                            {
+                                System.out.println(sb.length());
+                                yieldReturn(pair);
+                            }
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        sb.setLength(sb.length() - 1);
+                    }
+                }
             }
-        }
-        return result;
+        };
     }
 
 

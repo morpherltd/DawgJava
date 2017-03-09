@@ -123,7 +123,13 @@ public class Dawg<TPayload> implements Iterable<Map.Entry<String, TPayload>> {
     @Override
     public Iterator<Map.Entry<String, TPayload>> iterator() {
         try {
-            return getEnumerator().iterator();
+            Iterable<Map.Entry<String, TPayload>> enumerator = getEnumerator();
+//            for (Map.Entry<String, TPayload> next:
+//                 enumerator) {
+//                System.out.println("dict key: " + next.getKey());
+////            System.out.println("dict key: " + next.getKey() + " " + next.getValue().GetEnumerator().iterator().next().NounSuffix);
+//            }
+            return enumerator.iterator();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

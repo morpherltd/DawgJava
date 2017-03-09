@@ -1,5 +1,6 @@
 package com.morpherltd.dawg;
 
+import com.google.common.base.Joiner;
 import com.morpherltd.dawg.helpers.MReader;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -96,7 +97,7 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
             throws IllegalAccessException, InstantiationException {
         ArrayList<Map.Entry<String, TPayload>> result = new ArrayList<>();
 
-        String prefixStr = prefix.toString();
+        String prefixStr = Joiner.on("").join(prefix);
 
         ArrayList<Integer> path = getPath(prefix);
         int node_i = prefixStr.length() == 0 ? rootNodeIndex : path.get(path.size() - 1);
@@ -222,7 +223,11 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
                 throw new RuntimeException(e.getMessage());
             }
         });
-        indexToChar = tmpChars.toString().toCharArray();
+        StringBuilder sb = new StringBuilder();
+        for (char aa : tmpChars) {
+            sb.append(aa);
+        }
+        indexToChar = sb.toString().toCharArray();
 
         charToIndexPlusOne = getCharToIndexPlusOneMap(indexToChar);
 
@@ -243,7 +248,7 @@ public class MatrixDawg<TPayload> implements IDawg <TPayload> {
             System.out.println(Integer.toBinaryString(0x100 + uniqueChars[i]).substring(2));
         System.out.println("--------");
 
-        short to = (short) uniqueChars[uniqueChars.length - 2];
+        short to = (short) uniqueChars[uniqueChars.length - 1];
         short from = (short) uniqueChars[0];
         int toInt = to >= 0 ? to : 0x10000 + to;
         int fromInt = from >= 0 ? from : 0x10000 + from;

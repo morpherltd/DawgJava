@@ -11,7 +11,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DictionaryPayloadCollection {
-    private final DictionaryPayload[] payloads;
+    private DictionaryPayload[] payloads;
+
+    public DictionaryPayloadCollection () {
+        this(new ArrayList<>());
+    }
 
     public DictionaryPayloadCollection (Iterable<DictionaryPayload> payloads) {
         this.payloads = Iterables.toArray(payloads, DictionaryPayload.class);

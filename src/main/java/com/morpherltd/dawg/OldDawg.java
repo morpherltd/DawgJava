@@ -1,5 +1,7 @@
 package com.morpherltd.dawg;
 
+import com.google.common.base.Joiner;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -60,7 +62,7 @@ public class OldDawg<TPayload> implements IDawg<TPayload> {
 
         StringBuilder sb = new StringBuilder ();
 
-        sb.append(prefix.toString());
+        sb.append(Joiner.on("").join(prefix));
 
         return new PrefixMatcher<TPayload>(sb, cls).matchPrefix(node);
     }
@@ -126,13 +128,17 @@ public class OldDawg<TPayload> implements IDawg<TPayload> {
 
         ArrayList<Character> sortedAllChars = new ArrayList<>(allChars);
         Collections.sort(sortedAllChars);
+        char[] allCharsArr = new char[sortedAllChars.size()];
+        int i = 0;
         for (char c : sortedAllChars) {
             writer.writeChar(c);
+            allCharsArr[i] = c;
+            i++;
         }
 
         writer.writeInt(totalChildCount);
 
-        char[] allCharsArr = sortedAllChars.toString().toCharArray();
+//        char[] allCharsArr = sortedAllChars.toString().toCharArray();
 
         writeChildrenNoLength(writer, allNodes, nodeIndex, allCharsArr);
     }
@@ -199,11 +205,15 @@ public class OldDawg<TPayload> implements IDawg<TPayload> {
 
         ArrayList<Character> sortedAllChars = new ArrayList<>(allChars);
         Collections.sort(sortedAllChars);
+        char[] allCharsArr = new char[sortedAllChars.size()];
+        int i = 0;
         for (char c : sortedAllChars) {
             writer.writeChar(c);
+            allCharsArr[i] = c;
+            i++;
         }
 
-        char[] allCharsArr = sortedAllChars.toString().toCharArray();
+//        char[] allCharsArr = sortedAllChars.toString().toCharArray();
 
         writeChildren(writer, nodeIndex, hasBoth, allCharsArr);
         writeChildren(writer, nodeIndex, hasChildren, allCharsArr);
