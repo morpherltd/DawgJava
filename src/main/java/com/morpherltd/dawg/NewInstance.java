@@ -1,5 +1,7 @@
 package com.morpherltd.dawg;
 
+import com.morpherltd.dawg.adject.DictionaryPayloadCollection;
+
 import java.lang.reflect.Constructor;
 
 public class NewInstance {
@@ -9,6 +11,9 @@ public class NewInstance {
             return (TPayload) cls.newInstance();
         } catch (InstantiationException e) {
             try {
+                if (cls == DictionaryPayloadCollection.class) {
+                    return null;
+                }
                 Constructor<TPayload> ctor = cls.getConstructor(String.class);
                 TPayload tp = ctor.newInstance(get(cls).toString());
                 return tp;

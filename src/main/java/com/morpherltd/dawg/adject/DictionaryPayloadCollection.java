@@ -13,16 +13,14 @@ import java.util.Arrays;
 public class DictionaryPayloadCollection {
     private DictionaryPayload[] payloads;
 
-    public DictionaryPayloadCollection () {
-        this(new ArrayList<>());
-    }
-
     public DictionaryPayloadCollection (Iterable<DictionaryPayload> payloads) {
         this.payloads = Iterables.toArray(payloads, DictionaryPayload.class);
     }
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == null && this == null) return true;
+        if (obj == null || this == null) return false;
         DictionaryPayloadCollection that = (DictionaryPayloadCollection) obj;
 
         return this.payloads.equals(that.payloads);

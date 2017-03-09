@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.infomancers.collections.yield.Yielder;
 import com.morpherltd.dawg.helpers.BinaryUtil;
 import com.morpherltd.dawg.helpers.MReader;
+import com.yielderable.Yielderable;
 
 import java.io.IOException;
 import java.util.*;
@@ -135,7 +136,7 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
         ArrayList<Integer> p = getPath(word);
         int node_i = p.get(p.size() - 1);
 
-        if (node_i == -1) return cls.newInstance();
+        if (node_i == -1) return NewInstance.make(cls);
 
         return getPayload(node_i);
     }
@@ -224,14 +225,12 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
         return matchPrefix(sb, node_i);
     }
 
-
-    private Iterable<Map.Entry<String, TPayload>> matchPrefix (
+    private Iterable<Map.Entry<String, TPayload>> matchPrefix2 (
             StringBuilder sb, int node_i)
             throws IllegalAccessException, InstantiationException {
+
         ArrayList<Map.Entry<String, TPayload>> result = new ArrayList<>();
 
-        return new Yielder<Map.Entry<String, TPayload>>() {
-            @Override protected void yieldNextCore() {
                 if (node_i != -1)
                 {
                     TPayload payload = null;
@@ -241,9 +240,10 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
                         throw new RuntimeException(e);
                     }
 
-                    if (!payload.equals(NewInstance.make(cls)))
+                    if (payload != null && !payload.equals(NewInstance.make(cls)))
                     {
                         result.add(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
+//                        yieldReturn(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
                     }
 
                     int firstChild_i = firstChildForNode [node_i];
@@ -256,6 +256,114 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
                     {
                         Child child = children [i];
 
+                        System.out.println(child);
+                        System.out.println("\t" + sb);
+
+                        sb.append(indexToChar [child.CharIndex]);
+
+                        try {
+                            for (Map.Entry<String, TPayload> pair
+                                : matchPrefix (sb, child.Index))
+                            {
+                                System.out.println(sb.length());
+//                                yieldReturn(pair);
+                                result.add(pair);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
+
+                        sb.setLength(sb.length() - 1);
+                    }
+                }
+        return result;
+    }
+
+    private Yielderable<Map.Entry<String, TPayload>> matchPrefix (
+        StringBuilder sb, int node_i)
+        throws IllegalAccessException, InstantiationException {
+        return yield -> {
+                if (node_i != -1)
+                {
+                    TPayload payload = null;
+                    try {
+                        payload = getPayload(node_i);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    if (payload != null && !payload.equals(NewInstance.make(cls)))
+                    {
+//                        result.add(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
+                        yield.returning(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
+                    }
+                    int firstChild_i = firstChildForNode [node_i];
+
+                    int lastChild_i = node_i + 1 < nodeCount
+                        ? firstChildForNode[node_i + 1]
+                        : children.length;
+
+                    for (int i = firstChild_i; i < lastChild_i; ++i)
+                    {
+                        Child child = children [i];
+
+                        System.out.println(child);
+                        System.out.println("\t" + sb);
+
+                        sb.append(indexToChar [child.CharIndex]);
+
+                        try {
+                            for (Map.Entry<String, TPayload> pair
+                                : matchPrefix (sb, child.Index))
+                            {
+                                System.out.println(sb.length());
+                                yield.returning(pair);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
+
+                        sb.setLength(sb.length() - 1);
+                    }
+                }
+        };
+    }
+
+    private Iterable<Map.Entry<String, TPayload>> matchPrefix3 (
+            StringBuilder sb, int node_i)
+            throws IllegalAccessException, InstantiationException {
+        return new Yielder<Map.Entry<String, TPayload>>() {
+            @Override protected void yieldNextCore() {
+                if (node_i != -1)
+                {
+                    TPayload payload = null;
+                    try {
+                        payload = getPayload(node_i);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    if (payload != null && !payload.equals(NewInstance.make(cls)))
+                    {
+//                        result.add(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
+                        yieldReturn(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
+                    }
+
+                    int firstChild_i = firstChildForNode [node_i];
+
+                    int lastChild_i = node_i + 1 < nodeCount
+                        ? firstChildForNode[node_i + 1]
+                        : children.length;
+
+                    for (int i = firstChild_i; i < lastChild_i; ++i)
+                    {
+                        Child child = children [i];
+
+                        System.out.println(child);
+                        System.out.println("\t" + sb);
+
                         sb.append(indexToChar [child.CharIndex]);
 
                         try {
@@ -266,6 +374,7 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
                                 yieldReturn(pair);
                             }
                         } catch (Exception e) {
+                            e.printStackTrace();
                             throw new RuntimeException(e);
                         }
 
