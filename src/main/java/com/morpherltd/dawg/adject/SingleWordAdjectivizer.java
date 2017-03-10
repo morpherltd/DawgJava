@@ -14,6 +14,8 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SingleWordAdjectivizer {
     private Dawg <DictionaryPayloadCollection> dictionary;
@@ -65,17 +67,24 @@ public class SingleWordAdjectivizer {
 //        reverseDictionary = dawgBuilder.buildDawg();
 //        System.out.println("finishedBuildDawg");
 
-        Iterator<Map.Entry<String, DictionaryPayloadCollection>> rit = reverseDictionary.iterator();
-        ArrayList<String> asd = new ArrayList<>();
-        while (it.hasNext()) {
-            Map.Entry<String, DictionaryPayloadCollection> next = it.next();
-            System.out.println("dict key: " + next.getKey());
-            asd.add(next.getKey());
-//            System.out.println("dict key: " + next.getKey() + " " + next.getValue().GetEnumerator().iterator().next().NounSuffix);
-        }
-        for (int i = 0; i < asd.size(); i++) {
-            System.out.println(i + ": " + asd.get(i));
-        }
+//        Iterator<Map.Entry<String, Boolean>> rit = reverseDictionary.iterator();
+//        while (rit.hasNext()) {
+//            Map.Entry<String, Boolean> next = rit.next();
+////            System.out.println("reverse dict key: " + next.getKey() + " " + next.getValue());
+//            System.out.println(next.getKey());
+//        }
+
+
+//        ArrayList<String> asd = new ArrayList<>();
+//        while (it.hasNext()) {
+//            Map.Entry<String, DictionaryPayloadCollection> next = it.next();
+//            System.out.println("dict key: " + next.getKey());
+//            asd.add(next.getKey());
+////            System.out.println("dict key: " + next.getKey() + " " + next.getValue().GetEnumerator().iterator().next().NounSuffix);
+//        }
+//        for (int i = 0; i < asd.size(); i++) {
+//            System.out.println(i + ": " + asd.get(i));
+//        }
 
         Iterator<Map.Entry<String, DictionaryPayloadCollection>> it = dictionary.iterator();
         payloadRanks = new HashMap<>();
@@ -98,24 +107,22 @@ public class SingleWordAdjectivizer {
             throws IllegalAccessException, InstantiationException {
         String lcNoun = noun.toLowerCase(Locale.ROOT);
 
-        Iterable<DictionaryPayload> payloads =
-            dictionary.get(Lists.charactersOf(lcNoun)).GetEnumerator();
-
-        ArrayList<String> result = new ArrayList<>();
-        for (DictionaryPayload p : payloads) {
-            result.add(getAdjective(lcNoun, p).replace(' ', '-'));
+        DictionaryPayloadCollection prePayloads = dictionary.get(Lists.charactersOf(lcNoun));
+        Iterable<DictionaryPayload> payloads = null;
+        if (prePayloads != null) {
+            payloads = prePayloads.GetEnumerator();
         }
 
-        if (result.size() == 0)
-//        if (payloads == null)
-        {
+        Stream<DictionaryPayload> payloadsDescending = Stream.empty();
+
+//        if (result.size() == 0)
+        if (prePayloads == null) {
             String lcNounReversed = new StringBuilder(lcNoun).reverse().toString();
             int suffixLength = reverseDictionary.getLongestCommonPrefixLength(
                 Lists.charactersOf(lcNounReversed)
             );
 
-            do
-            {
+            do {
                 int currentSuffixLength = suffixLength;
 
                 HashSet<DictionaryPayload> distinct = new HashSet<>();
@@ -123,10 +130,10 @@ public class SingleWordAdjectivizer {
                 String suf = lcNounReversed.substring(0, suffixLength);
                 Iterable<Map.Entry<String, Boolean>> matched =
                     reverseDictionary.matchPrefix(Lists.charactersOf(suf));
-                for (Map.Entry<String, Boolean> tpl: matched) {
+                for (Map.Entry<String, Boolean> tpl : matched) {
                     String n = StrHelper.reverse(tpl.getKey());
                     DictionaryPayloadCollection pc = dictionary.get(Lists.charactersOf(n));
-                    for (DictionaryPayload p: pc.GetEnumerator()) {
+                    for (DictionaryPayload p : pc.GetEnumerator()) {
                         if (canBeApplied(n, lcNoun, currentSuffixLength)) {
                             if (p.NounSuffix.length() <= currentSuffixLength) {
                                 distinct.add(p);
@@ -135,17 +142,41 @@ public class SingleWordAdjectivizer {
                     }
                 }
 
-                DictionaryPayload[] payloadsDescending = (DictionaryPayload[])
-                    distinct.stream().sorted(
+                if (distinct.size() != 0) {
+                    Stream<DictionaryPayload> sortedDistinct = distinct.stream().sorted(
                         (p1, p2) -> -(payloadRanks.get(p2) - payloadRanks.get(p1))
-                    ).toArray(size -> new Object[size]);
-
-                if (payloadsDescending.length > 0)
+                    );
+                    payloadsDescending = sortedDistinct;
                     break;
+                } else {
+//                    payloadsDescending = new DictionaryPayload[0];
+                }
+
+//                if (payloadsDescending.length > 0)
+//                    break;
             }
             while (--suffixLength >= 0);
         }
-        return result;
+
+        ArrayList<String> result = new ArrayList<>();
+
+        if (prePayloads == null) {
+            Iterator<DictionaryPayload> iter = payloadsDescending.iterator();
+            while (iter.hasNext()) {
+                result.add(getAdjective(lcNoun, iter.next()).replace(' ', '-'));
+            }
+            return result;
+        }
+        if (payloads != null) {
+                for (DictionaryPayload p : payloads) {
+                    result.add(getAdjective(lcNoun, p).replace(' ', '-'));
+                }
+            return result;
+        }
+
+//        if (prePayloads == null) {
+            return new ArrayList<>();
+//        }
     }
 
     static boolean canBeApplied(String dictionaryNoun, String noun, int suffixLength)
@@ -157,7 +188,10 @@ public class SingleWordAdjectivizer {
     }
 
     private static Object category (int suffixLength, String noun) {
-        Object category = category(StrHelper.reverse(noun).substring(suffixLength, 1).charAt(0));
+        String reversedNoun = StrHelper.reverse(noun);
+        String substr = reversedNoun.substring(suffixLength, suffixLength + 1);
+        char first = substr.charAt(0);
+        Object category = category(first);
 
         return category;
     }
