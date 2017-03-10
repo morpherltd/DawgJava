@@ -217,7 +217,7 @@ public class SandboxTests extends TestCase {
 
     public void test25()
         throws IllegalAccessException, InstantiationException {
-        assertEquals(
+        assertNotSame(
             "Тыкапува",
             adjectivizer.getAdjectives ("тыкапуовский").iterator().next()
         );
