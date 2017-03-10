@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 public class NewInstance {
 
     public static <TPayload> TPayload make(Class cls) {
+//        return null;
         try {
             return (TPayload) cls.newInstance();
         } catch (InstantiationException e) {
@@ -25,7 +26,7 @@ public class NewInstance {
         }
     }
 
-    public static Object get(Class tp) {
+    private static Object get(Class tp) {
         if (tp.equals(Integer.class)) {
             return 0;
         } else if (tp.equals(Boolean.class)) {

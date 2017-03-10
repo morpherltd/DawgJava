@@ -56,7 +56,11 @@ public class NodeWrapper<TPayload> {
     }
 
     private int getHashCode(Node<TPayload> node) {
-        int hashCode = node.getPayload().hashCode();
+        TPayload payload = node.getPayload();
+        if (payload == null) return 0;
+
+        int hashCode = payload.hashCode();
+//        int hashCode = 0;
 
         for (Map.Entry<Character, Node<TPayload>> c:
                 node.children().entrySet()){
@@ -64,6 +68,7 @@ public class NodeWrapper<TPayload> {
         }
 
         return hashCode;
+//        return 0;
     }
 
     @Override

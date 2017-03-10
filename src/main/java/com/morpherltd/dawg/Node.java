@@ -16,7 +16,7 @@ public class Node<TPayload> {
 
     public Node(Class<TPayload> cls) {
         this.cls = cls;
-        _payload = (TPayload) NewInstance.get(this.cls);
+        _payload = (TPayload) NewInstance.make(this.cls);
     }
 
     public TPayload getPayload() {

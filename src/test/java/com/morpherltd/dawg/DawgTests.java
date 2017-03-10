@@ -41,8 +41,18 @@ public class DawgTests extends TestCase {
         dawgBuilder.insert (Lists.charactersOf("tap"), 3);
 
         DawgTestsHelper<Integer> helper = new DawgTestsHelper<>();
-        Dawg<Integer> rehydrated = helper.getDawg (dawgBuilder);
+        Dawg<Integer> rehydrated = helper.getDawg(dawgBuilder);
 
+//        assertEquals(10, (int) rehydrated.get(Lists.charactersOf("cone")));
+//        assertEquals(10, (int) rehydrated.get(Lists.charactersOf("bone")));
+//        assertNull(rehydrated.get(Lists.charactersOf("cones")));
+//        assertEquals(9, (int) rehydrated.get(Lists.charactersOf("gone")));
+//        assertNull(rehydrated.get(Lists.charactersOf("g")));
+//        assertEquals(5, (int) rehydrated.get(Lists.charactersOf("go")));
+//        assertNull(rehydrated.get(Lists.charactersOf("god")));
+//        assertEquals(3, (int) rehydrated.get(Lists.charactersOf("tip")));
+//        assertEquals(3, (int) rehydrated.get(Lists.charactersOf("tap")));
+//        assertNull(rehydrated.get(Lists.charactersOf("")));
         assertEquals(10, (int) rehydrated.get(Lists.charactersOf("cone")));
         assertEquals(10, (int) rehydrated.get(Lists.charactersOf("bone")));
         assertEquals(0, (int) rehydrated.get(Lists.charactersOf("cones")));
@@ -112,7 +122,7 @@ public class DawgTests extends TestCase {
         long tStart = System.currentTimeMillis();
 
         String fileName = "eneko-words.txt";
-        ArrayList<String> words = readLinesFromFile(fileName, 10000);
+        ArrayList<String> words = readLinesFromFile(fileName, 20000);
 
         DawgBuilder<Boolean> dawgBuilder = new DawgBuilder<>(Boolean.class);
 
