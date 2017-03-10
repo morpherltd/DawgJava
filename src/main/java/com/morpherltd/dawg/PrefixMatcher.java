@@ -18,6 +18,8 @@ public class PrefixMatcher<TPayload> {
             throws IllegalAccessException, InstantiationException {
         ArrayList<Map.Entry<String, TPayload>> result = new ArrayList<>();
 
+        if (node == null) return result;
+
         if (!node.getPayload().equals(NewInstance.make(cls)))
         {
             result.add(new AbstractMap.SimpleEntry<>(

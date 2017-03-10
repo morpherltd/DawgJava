@@ -58,12 +58,7 @@ public class SingleWordAdjectivizer {
     public Iterable<String> getAdjectives(String noun) {
         String lcNoun = noun.toLowerCase(Locale.ROOT);
 
-        DictionaryPayloadCollection prePayloads;
-        try {
-            prePayloads = dictionary.get(Lists.charactersOf(lcNoun));
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        DictionaryPayloadCollection prePayloads = dictionary.get(Lists.charactersOf(lcNoun));
         Iterable<DictionaryPayload> payloads = null;
         if (prePayloads != null) {
             payloads = prePayloads.GetEnumerator();
@@ -83,20 +78,10 @@ public class SingleWordAdjectivizer {
                 HashSet<DictionaryPayload> distinct = new HashSet<>();
 
                 String suf = lcNounReversed.substring(0, suffixLength);
-                Iterable<Map.Entry<String, Boolean>> matched;
-                try {
-                    matched = reverseDictionary.matchPrefix(Lists.charactersOf(suf));
-                } catch (InstantiationException | IllegalAccessException  e) {
-                    throw new RuntimeException(e);
-                }
+                Iterable<Map.Entry<String, Boolean>> matched = reverseDictionary.matchPrefix(Lists.charactersOf(suf));
                 for (Map.Entry<String, Boolean> tpl : matched) {
                     String n = StrHelper.reverse(tpl.getKey());
-                    DictionaryPayloadCollection pc;
-                    try {
-                        pc = dictionary.get(Lists.charactersOf(n));
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
+                    DictionaryPayloadCollection pc = dictionary.get(Lists.charactersOf(n));
                     for (DictionaryPayload p : pc.GetEnumerator()) {
                         if (canBeApplied(n, lcNoun, currentSuffixLength)) {
                             if (p.NounSuffix.length() <= currentSuffixLength) {
