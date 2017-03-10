@@ -8,8 +8,7 @@ public class Adjectivizer {
     public Adjectivizer() throws IOException {
     }
 
-    public Iterable<String> getAdjectives(String phrase)
-            throws InstantiationException, IllegalAccessException {
+    public Iterable<String> getAdjectives(String phrase) {
         String noun = WordJoiner.toLowerAndJoinWords(phrase);
 
         return singleWordAdjectivizer.getAdjectives(noun);

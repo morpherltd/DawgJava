@@ -39,62 +39,14 @@ public class SingleWordAdjectivizer {
 
     public void init(Dawg<DictionaryPayloadCollection> dictionary) {
         this.dictionary = dictionary;
-//        ArrayList<String> asd = new ArrayList<>();
-//        while (it.hasNext()) {
-//            Map.Entry<String, DictionaryPayloadCollection> next = it.next();
-//            System.out.println("dict key: " + next.getKey());
-//            asd.add(next.getKey());
-////            System.out.println("dict key: " + next.getKey() + " " + next.getValue().GetEnumerator().iterator().next().NounSuffix);
-//        }
-//
-//        for (int i = 0; i < asd.size(); i++) {
-//            System.out.println(i + ": " + asd.get(i));
-//        }
-
-        System.out.println("CORRECT UP TO HERE");
-
         reverseDictionary = DawgExtensions.toDawg(dictionary, e -> Lists.charactersOf(new StringBuilder(e.getKey()).reverse().toString()), e -> true, Boolean.class);
-//        DawgBuilder<Boolean> dawgBuilder = new DawgBuilder(Boolean.class);
-//        for (Map.Entry<String, DictionaryPayloadCollection> elem : dictionary) {
-//            System.out.println("key: " + elem.getKey());
-//            dawgBuilder.insert(
-//                Lists.charactersOf(new StringBuilder(elem.getKey()).reverse().toString()),
-//                true
-//            );
-//        }
-
-//        System.out.println("buildDawg");
-//        reverseDictionary = dawgBuilder.buildDawg();
-//        System.out.println("finishedBuildDawg");
-
-//        Iterator<Map.Entry<String, Boolean>> rit = reverseDictionary.iterator();
-//        while (rit.hasNext()) {
-//            Map.Entry<String, Boolean> next = rit.next();
-////            System.out.println("reverse dict key: " + next.getKey() + " " + next.getValue());
-//            System.out.println(next.getKey());
-//        }
-
-
-//        ArrayList<String> asd = new ArrayList<>();
-//        while (it.hasNext()) {
-//            Map.Entry<String, DictionaryPayloadCollection> next = it.next();
-//            System.out.println("dict key: " + next.getKey());
-//            asd.add(next.getKey());
-////            System.out.println("dict key: " + next.getKey() + " " + next.getValue().GetEnumerator().iterator().next().NounSuffix);
-//        }
-//        for (int i = 0; i < asd.size(); i++) {
-//            System.out.println(i + ": " + asd.get(i));
-//        }
 
         Iterator<Map.Entry<String, DictionaryPayloadCollection>> it = dictionary.iterator();
         payloadRanks = new HashMap<>();
         while (it.hasNext()) {
-//            System.out.println("dict key: " + dictionary.iterator().next().getKey());
             Map.Entry<String, DictionaryPayloadCollection> next = it.next();
             DictionaryPayloadCollection c = next.getValue();
             for (DictionaryPayload payload: c.GetEnumerator()) {
-                System.out.println(payload.NounSuffix);
-                System.out.println(payload.AdjvSuffix);
                 if (!payloadRanks.containsKey(payload))
                     payloadRanks.put(payload, 1);
                 else
@@ -103,11 +55,15 @@ public class SingleWordAdjectivizer {
         }
     }
 
-    public Iterable<String> getAdjectives(String noun)
-            throws IllegalAccessException, InstantiationException {
+    public Iterable<String> getAdjectives(String noun) {
         String lcNoun = noun.toLowerCase(Locale.ROOT);
 
-        DictionaryPayloadCollection prePayloads = dictionary.get(Lists.charactersOf(lcNoun));
+        DictionaryPayloadCollection prePayloads;
+        try {
+            prePayloads = dictionary.get(Lists.charactersOf(lcNoun));
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         Iterable<DictionaryPayload> payloads = null;
         if (prePayloads != null) {
             payloads = prePayloads.GetEnumerator();
@@ -115,7 +71,6 @@ public class SingleWordAdjectivizer {
 
         Stream<DictionaryPayload> payloadsDescending = Stream.empty();
 
-//        if (result.size() == 0)
         if (prePayloads == null) {
             String lcNounReversed = new StringBuilder(lcNoun).reverse().toString();
             int suffixLength = reverseDictionary.getLongestCommonPrefixLength(
@@ -128,11 +83,20 @@ public class SingleWordAdjectivizer {
                 HashSet<DictionaryPayload> distinct = new HashSet<>();
 
                 String suf = lcNounReversed.substring(0, suffixLength);
-                Iterable<Map.Entry<String, Boolean>> matched =
-                    reverseDictionary.matchPrefix(Lists.charactersOf(suf));
+                Iterable<Map.Entry<String, Boolean>> matched;
+                try {
+                    matched = reverseDictionary.matchPrefix(Lists.charactersOf(suf));
+                } catch (InstantiationException | IllegalAccessException  e) {
+                    throw new RuntimeException(e);
+                }
                 for (Map.Entry<String, Boolean> tpl : matched) {
                     String n = StrHelper.reverse(tpl.getKey());
-                    DictionaryPayloadCollection pc = dictionary.get(Lists.charactersOf(n));
+                    DictionaryPayloadCollection pc;
+                    try {
+                        pc = dictionary.get(Lists.charactersOf(n));
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
                     for (DictionaryPayload p : pc.GetEnumerator()) {
                         if (canBeApplied(n, lcNoun, currentSuffixLength)) {
                             if (p.NounSuffix.length() <= currentSuffixLength) {
@@ -148,18 +112,12 @@ public class SingleWordAdjectivizer {
                     );
                     payloadsDescending = sortedDistinct;
                     break;
-                } else {
-//                    payloadsDescending = new DictionaryPayload[0];
                 }
-
-//                if (payloadsDescending.length > 0)
-//                    break;
             }
             while (--suffixLength >= 0);
         }
 
         ArrayList<String> result = new ArrayList<>();
-
         if (prePayloads == null) {
             Iterator<DictionaryPayload> iter = payloadsDescending.iterator();
             while (iter.hasNext()) {
@@ -174,9 +132,7 @@ public class SingleWordAdjectivizer {
             return result;
         }
 
-//        if (prePayloads == null) {
-            return new ArrayList<>();
-//        }
+        return new ArrayList<>();
     }
 
     static boolean canBeApplied(String dictionaryNoun, String noun, int suffixLength)

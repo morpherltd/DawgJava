@@ -80,7 +80,6 @@ public class Node<TPayload> {
 
             if (curIterator.hasNext()) {
                 Map.Entry<Character, Node<TPayload>> curPair = curIterator.next();
-                System.out.println("Nivo: " + nivo + ", key: " + curPair.getKey());
 
                 Node<TPayload> node = curPair.getValue();
                 if (visitedNodes.contains(node)) {
@@ -96,14 +95,6 @@ public class Node<TPayload> {
                 deque.pop();
                 if (deque.size() == 0) break;
             }
-        }
-
-        for (Node<TPayload> a : result) {
-            System.out.println(a.getPayload());
-        }
-        System.out.println("visited:");
-        for (Node<TPayload> a : visitedNodes) {
-            System.out.println(a.getPayload());
         }
 
         return result;

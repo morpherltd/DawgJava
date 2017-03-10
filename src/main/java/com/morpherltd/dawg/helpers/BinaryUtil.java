@@ -58,17 +58,7 @@ public class BinaryUtil {
             throw new IOException("EOF");
         }
 
-        System.out.println("\tfirst:");
-        System.out.println(String.format("%8s", Integer.toBinaryString(firstByte[0] & 0xFF)).replace(' ', '0')); // 10000001
-
-        System.out.println(String.format("%8s", Integer.toBinaryString(0x7F & 0xFF)).replace(' ', '0')); // 10000001
-
-        System.out.println(Integer.toBinaryString(firstByte[0]));
-        System.out.println((firstByte[0] & 0xFF) <= 0b01111111);
-//        if (firstByte[0] <= (byte) 0x7F) {
         if ((firstByte[0] & 0xFF) <= 0b01111111) {
-//            ByteBuffer bb = ByteBuffer.wrap(firstByte);
-//            return bb.getChar();
             return (char) firstByte[0];
         } else if (0xC0 <= (firstByte[0] & 0xFF) && (firstByte[0] & 0xFF) <= 0xDF) {
             byte[] secondByte = new byte[1];
@@ -79,99 +69,17 @@ public class BinaryUtil {
             combined[0] = firstByte[0];
             combined[1] = secondByte[0];
 
-            System.out.println("-------");
-            System.out.println(String.format("%8s", Integer.toBinaryString(combined[0] & 0xFF)).replace(' ', '0')); // 10000001
-            System.out.println(String.format("%8s", Integer.toBinaryString(combined[1] & 0xFF)).replace(' ', '0')); // 10000001
-
             ByteBuffer bb = ByteBuffer.wrap(combined);
-            System.out.println(Character.toString(bb.getChar()));
 
             byte[] tmp = new byte[3];
             tmp[0] = combined[0];
             tmp[1] = combined[1];
             tmp[2] = 0x00;
             return new String(tmp).charAt(0);
-
-//            return bb.getChar();
-
         } else {
             throw new RuntimeException("Unknown byte char");
         }
     }
-
-    /*
-    public static char getChar(final InputStream fin) throws IOException {
-        byte[] firstByte = new byte[1];
-        if (fin.read(firstByte) < 0) {
-            throw new IOException("EOF");
-        }
-
-        System.out.println("\tfirst:");
-        System.out.println(String.format("%8s", Integer.toBinaryString(firstByte[0] & 0xFF)).replace(' ', '0')); // 10000001
-
-        System.out.println(String.format("%8s", Integer.toBinaryString(0x7F & 0xFF)).replace(' ', '0')); // 10000001
-
-        System.out.println(Integer.toBinaryString(firstByte[0]));
-        System.out.println((firstByte[0] & 0xFF) <= 0b01111111);
-//        if (firstByte[0] <= (byte) 0x7F) {
-        if ((firstByte[0] & 0xFF) <= 0b01111111) {
-//            ByteBuffer bb = ByteBuffer.wrap(firstByte);
-//            return bb.getChar();
-            return (char) firstByte[0];
-        } else if (0xC0 <= (firstByte[0] & 0xFF) && (firstByte[0] & 0xFF) <= 0xDF) {
-            byte[] secondByte = new byte[1];
-            if (fin.read(secondByte) < 0) {
-                throw new IOException("EOF");
-            }
-            byte[] combined = new byte[2];
-            combined[0] = firstByte[0];
-            combined[1] = secondByte[0];
-
-            System.out.println("-------");
-            System.out.println(String.format("%8s", Integer.toBinaryString(combined[0] & 0xFF)).replace(' ', '0')); // 10000001
-            System.out.println(String.format("%8s", Integer.toBinaryString(combined[1] & 0xFF)).replace(' ', '0')); // 10000001
-
-            ByteBuffer bb = ByteBuffer.wrap(combined);
-            return bb.getChar();
-
-        } else {
-            throw new RuntimeException("Unknown byte char");
-        }
-    }
-    */
-
-
-    /*
-    public static char getChar(final InputStream fin) throws IOException {
-        byte[] buffer = new byte[2];
-        ByteBuffer bb = ByteBuffer.wrap(buffer);
-        if (fin.read(buffer) < 0) {
-            throw new IOException("EOF");
-        }
-        bb.order(ByteOrder.LITTLE_ENDIAN);
-        bb.position(0);
-
-        System.out.println(String.format("%8s", Integer.toBinaryString(buffer[0] & 0xFF)).replace(' ', '0')); // 10000001
-        System.out.println(String.format("%8s", Integer.toBinaryString(buffer[1] & 0xFF)).replace(' ', '0')); // 10000001
-        System.out.println(String.format("%02X ", buffer[0]));
-        System.out.println(String.format("%02X ", buffer[1]));
-        System.out.println("---");
-
-//        return bb.getChar();
-        return new String(buffer).charAt(0);
-//        String v = new String( bb.array(), Charset.forName("UTF-8") );
-//        return v.charAt(0);
-
-//        byte[] buffer = new byte[80];
-//        fin.read(buffer);
-//        System.out.println(buffer);
-//
-//        for (int i = 0; i < 80; i++)
-//            System.out.println(String.format("%8s", Integer.toBinaryString(buffer[i] & 0xFF)).replace(' ', '0')); // 10000001
-//
-//        return 'a';
-    }
-    */
 
     public static short getShort(final InputStream fin) throws IOException {
         byte[] buffer = new byte[2];

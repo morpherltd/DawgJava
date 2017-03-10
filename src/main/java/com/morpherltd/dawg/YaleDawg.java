@@ -33,63 +33,31 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
 
         // The nodes are grouped by (has payload, has children).
         nodeCount = reader.readInt();
-        System.out.println("nodeCount: " + nodeCount);
 
         rootNodeIndex = reader.readInt();
-        System.out.println("rootNodeIndex: " + rootNodeIndex);
 
         payloads = MatrixDawg.<TPayload>readArray(reader, readPayload);
 
-        final boolean[] ja = {true};
         Character[] tmpChars = MatrixDawg.readCharArray(reader, (MReader r) -> {
             try {
-//                if (ja[0])
-//                    r.readByte();
-//                ja[0] = false;
-
-
                 char ch = r.readChar();
-                System.out.println("Char: " + ch);
-                System.out.println("Char bin: " + Integer.toBinaryString(0x100 + ch).substring(2));
                 return (Character)ch;
             } catch (IOException e) { throw new RuntimeException(e); }
         });
 
-        System.out.println("tmpChars:");
         indexToChar = new char[tmpChars.length];
         for (int i = 0; i < tmpChars.length; i++) {
             char ccc = tmpChars[i];
             indexToChar[i] = ccc;
-            System.out.println("\t" + Integer.toBinaryString(0x100 + tmpChars[i]).substring(2));
         }
-        System.out.println();
-
-//        indexToChar = tmpChars.toString().toCharArray();
-
-        System.out.println("stuff: '" + tmpChars.toString() + "'");
-        System.out.println("ichar len: " + indexToChar.length);
-        for (char ccc : indexToChar) {
-            System.out.print(ccc + ",");
-        }
-        System.out.println();
 
         charToIndexPlusOne = MatrixDawg.<TPayload>getCharToIndexPlusOneMap(indexToChar);
-
-        System.out.println("charToIndexPlusOne:");
-        System.out.println(charToIndexPlusOne);
-//        for(short aa : charToIndexPlusOne)
-//        {
-//            System.out.println("\t" + aa);
-//        }
-        System.out.println("charToIndexPlusOne len:");
-        System.out.println(charToIndexPlusOne.length);
 
         firstChildForNode = new int[nodeCount+1];
 
         int firstChildForNode_i = 0;
 
         int totalChildCount = reader.readInt();
-        System.out.println("totalChildCount: " + totalChildCount);
 
         children = new Child[totalChildCount];
 
@@ -225,61 +193,6 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
         return matchPrefix(sb, node_i);
     }
 
-    private Iterable<Map.Entry<String, TPayload>> matchPrefix2 (
-            StringBuilder sb, int node_i)
-            throws IllegalAccessException, InstantiationException {
-
-        ArrayList<Map.Entry<String, TPayload>> result = new ArrayList<>();
-
-                if (node_i != -1)
-                {
-                    TPayload payload = null;
-                    try {
-                        payload = getPayload(node_i);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    if (payload != null && !payload.equals(NewInstance.make(cls)))
-                    {
-                        result.add(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
-//                        yieldReturn(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
-                    }
-
-                    int firstChild_i = firstChildForNode [node_i];
-
-                    int lastChild_i = node_i + 1 < nodeCount
-                        ? firstChildForNode[node_i + 1]
-                        : children.length;
-
-                    for (int i = firstChild_i; i < lastChild_i; ++i)
-                    {
-                        Child child = children [i];
-
-                        System.out.println(child);
-                        System.out.println("\t" + sb);
-
-                        sb.append(indexToChar [child.CharIndex]);
-
-                        try {
-                            for (Map.Entry<String, TPayload> pair
-                                : matchPrefix (sb, child.Index))
-                            {
-                                System.out.println(sb.length());
-//                                yieldReturn(pair);
-                                result.add(pair);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            throw new RuntimeException(e);
-                        }
-
-                        sb.setLength(sb.length() - 1);
-                    }
-                }
-        return result;
-    }
-
     private Yielderable<Map.Entry<String, TPayload>> matchPrefix (
         StringBuilder sb, int node_i)
         throws IllegalAccessException, InstantiationException {
@@ -308,16 +221,12 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
                     {
                         Child child = children [i];
 
-                        System.out.println(child);
-                        System.out.println("\t" + sb);
-
                         sb.append(indexToChar [child.CharIndex]);
 
                         try {
                             for (Map.Entry<String, TPayload> pair
                                 : matchPrefix (sb, child.Index))
                             {
-                                System.out.println(sb.length());
                                 yield.returning(pair);
                             }
                         } catch (Exception e) {
@@ -330,61 +239,6 @@ public class YaleDawg<TPayload> implements IDawg<TPayload> {
                 }
         };
     }
-
-    private Iterable<Map.Entry<String, TPayload>> matchPrefix3 (
-            StringBuilder sb, int node_i)
-            throws IllegalAccessException, InstantiationException {
-        return new Yielder<Map.Entry<String, TPayload>>() {
-            @Override protected void yieldNextCore() {
-                if (node_i != -1)
-                {
-                    TPayload payload = null;
-                    try {
-                        payload = getPayload(node_i);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    if (payload != null && !payload.equals(NewInstance.make(cls)))
-                    {
-//                        result.add(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
-                        yieldReturn(new AbstractMap.SimpleEntry<>(sb.toString(), payload));
-                    }
-
-                    int firstChild_i = firstChildForNode [node_i];
-
-                    int lastChild_i = node_i + 1 < nodeCount
-                        ? firstChildForNode[node_i + 1]
-                        : children.length;
-
-                    for (int i = firstChild_i; i < lastChild_i; ++i)
-                    {
-                        Child child = children [i];
-
-                        System.out.println(child);
-                        System.out.println("\t" + sb);
-
-                        sb.append(indexToChar [child.CharIndex]);
-
-                        try {
-                            for (Map.Entry<String, TPayload> pair
-                                : matchPrefix (sb, child.Index))
-                            {
-                                System.out.println(sb.length());
-                                yieldReturn(pair);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            throw new RuntimeException(e);
-                        }
-
-                        sb.setLength(sb.length() - 1);
-                    }
-                }
-            }
-        };
-    }
-
 
     @Override
     public int getNodeCount() {
