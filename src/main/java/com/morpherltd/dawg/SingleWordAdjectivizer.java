@@ -11,15 +11,20 @@ class SingleWordAdjectivizer {
     private Dawg<Boolean> reverseDictionary;
     private HashMap<DictionaryPayload, Integer> payloadRanks;
 
-    public SingleWordAdjectivizer () throws IOException {
-        MReader byteArrayInputStream = new MReader("Dictionary.dawg");
-        init(new DawgStatic<DictionaryPayloadCollection>(DictionaryPayloadCollection.class).load(byteArrayInputStream, r -> {
-                try {
-                    return DictionaryPayloadCollection.read(r);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-        }));
+    public SingleWordAdjectivizer () {
+        MReader byteArrayInputStream = null;
+        try {
+            byteArrayInputStream = new MReader("Dictionary.dawg");
+            init(new DawgStatic<DictionaryPayloadCollection>(DictionaryPayloadCollection.class).load(byteArrayInputStream, r -> {
+                    try {
+                        return DictionaryPayloadCollection.read(r);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+            }));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public SingleWordAdjectivizer (Dawg<DictionaryPayloadCollection> dictionary) {

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_morpherdawg" default="compile.module.morpherdawg">
+  <dirname property="module.morpherdawg.basedir" file="${ant.file.module_morpherdawg}"/>
+  
+  <property name="module.jdk.home.morpherdawg" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.morpherdawg" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.morpherdawg" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.morpherdawg" value="-encoding UTF-8 -source 8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="morpherdawg.output.dir" value="${module.morpherdawg.basedir}/target/classes"/>
+  <property name="morpherdawg.testoutput.dir" value="${module.morpherdawg.basedir}/target/test-classes"/>
+  
+  <path id="morpherdawg.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="morpherdawg.module.production.classpath">
+    <path refid="${module.jdk.classpath.morpherdawg}"/>
+    <path refid="library.maven:_com.google.guava:guava:21.0.classpath"/>
+    <path refid="library.maven:_commons-io:commons-io:2.5.classpath"/>
+    <path refid="library.maven:_asm:asm-all:3.3.1.classpath"/>
+  </path>
+  
+  <path id="morpherdawg.runtime.production.module.classpath">
+    <pathelement location="${morpherdawg.output.dir}"/>
+    <path refid="library.maven:_com.google.guava:guava:21.0.classpath"/>
+    <path refid="library.maven:_commons-io:commons-io:2.5.classpath"/>
+    <path refid="library.maven:_asm:asm-all:3.3.1.classpath"/>
+  </path>
+  
+  <path id="morpherdawg.module.classpath">
+    <path refid="${module.jdk.classpath.morpherdawg}"/>
+    <pathelement location="${morpherdawg.output.dir}"/>
+    <path refid="library.maven:_junit:junit:3.8.1.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:21.0.classpath"/>
+    <path refid="library.maven:_commons-io:commons-io:2.5.classpath"/>
+    <path refid="library.maven:_asm:asm-all:3.3.1.classpath"/>
+  </path>
+  
+  <path id="morpherdawg.runtime.module.classpath">
+    <pathelement location="${morpherdawg.testoutput.dir}"/>
+    <pathelement location="${morpherdawg.output.dir}"/>
+    <path refid="library.maven:_junit:junit:3.8.1.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:21.0.classpath"/>
+    <path refid="library.maven:_commons-io:commons-io:2.5.classpath"/>
+    <path refid="library.maven:_asm:asm-all:3.3.1.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.morpherdawg">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.morpherdawg">
+    <patternset refid="excluded.from.module.morpherdawg"/>
+  </patternset>
+  
+  <path id="morpherdawg.module.sourcepath">
+    <dirset dir="${module.morpherdawg.basedir}">
+      <include name="src/main/java"/>
+      <include name="src/main/resources"/>
+    </dirset>
+  </path>
+  
+  <path id="morpherdawg.module.test.sourcepath">
+    <dirset dir="${module.morpherdawg.basedir}">
+      <include name="src/test/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.morpherdawg" depends="compile.module.morpherdawg.production,compile.module.morpherdawg.tests" description="Compile module MorpherDawg"/>
+  
+  <target name="compile.module.morpherdawg.production" depends="register.custom.compilers" description="Compile module MorpherDawg; production classes">
+    <mkdir dir="${morpherdawg.output.dir}"/>
+    <javac2 destdir="${morpherdawg.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.morpherdawg}/javac">
+      <compilerarg line="${compiler.args.morpherdawg}"/>
+      <bootclasspath refid="morpherdawg.module.bootclasspath"/>
+      <classpath refid="morpherdawg.module.production.classpath"/>
+      <src refid="morpherdawg.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.morpherdawg"/>
+    </javac2>
+    
+    <copy todir="${morpherdawg.output.dir}">
+      <fileset dir="${module.morpherdawg.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.morpherdawg.basedir}/src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.morpherdawg.tests" depends="register.custom.compilers,compile.module.morpherdawg.production" description="compile module MorpherDawg; test classes" unless="skip.tests">
+    <mkdir dir="${morpherdawg.testoutput.dir}"/>
+    <javac2 destdir="${morpherdawg.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.morpherdawg}/javac">
+      <compilerarg line="${compiler.args.morpherdawg}"/>
+      <bootclasspath refid="morpherdawg.module.bootclasspath"/>
+      <classpath refid="morpherdawg.module.classpath"/>
+      <src refid="morpherdawg.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.morpherdawg"/>
+    </javac2>
+    
+    <copy todir="${morpherdawg.testoutput.dir}">
+      <fileset dir="${module.morpherdawg.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.morpherdawg" description="cleanup module">
+    <delete dir="${morpherdawg.output.dir}"/>
+    <delete dir="${morpherdawg.testoutput.dir}"/>
+  </target>
+</project>

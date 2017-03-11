@@ -4,6 +4,9 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 class MReader {
 
@@ -11,12 +14,12 @@ class MReader {
     private final FileInputStream _stream;
 
     public MReader(String fileName) throws IOException {
-        URL resource = getClass().getClassLoader().getResource(fileName);
-        byte[] bytes = FileUtils.readFileToByteArray(new File(resource.getPath()));
-
-        _stream = new FileInputStream(new File(resource.getPath()));
-
-//        _r = new ByteArrayInputStream(bytes);
+//        URL resource = getClass().getResource(fileName);
+        Path temp = Files.createTempFile("Dictionary-", ".dawg");
+        InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream(fileName);
+        Files.copy(resourceAsStream, temp, StandardCopyOption.REPLACE_EXISTING);
+        _stream = new FileInputStream(temp.toFile());
+//        _stream = new FileInputStream(ClassLoader.getSystemResource(fileName).getFile());
     }
 
     public int readInt() throws IOException {

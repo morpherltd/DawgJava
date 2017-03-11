@@ -5,7 +5,7 @@ import java.io.IOException;
 public class Adjectivizer {
     final SingleWordAdjectivizer singleWordAdjectivizer = new SingleWordAdjectivizer();
 
-    public Adjectivizer() throws IOException {
+    public Adjectivizer() {
     }
 
     public Iterable<String> getAdjectives(String phrase) {
