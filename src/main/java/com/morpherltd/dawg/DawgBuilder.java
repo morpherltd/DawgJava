@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 
 import java.util.ArrayList;
 
-public class DawgBuilder<TPayload> {
+class DawgBuilder<TPayload> {
     final Node<TPayload> root;
 
     final ArrayList<Node<TPayload>> lastPath = new ArrayList<>();

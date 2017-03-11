@@ -2,7 +2,7 @@ package com.morpherltd.dawg;
 
 import java.util.*;
 
-public class NodeWrapper<TPayload> {
+class NodeWrapper<TPayload> {
 
     public NodeWrapper(Node<TPayload> node, Node<TPayload> sup, char ch) {
         Node = node;

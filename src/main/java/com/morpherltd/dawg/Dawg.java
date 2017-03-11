@@ -1,14 +1,11 @@
 package com.morpherltd.dawg;
 
-import com.morpherltd.dawg.helpers.MReader;
-
 import java.io.*;
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class Dawg<TPayload> implements Iterable<Map.Entry<String, TPayload>> {
+class Dawg<TPayload> implements Iterable<Map.Entry<String, TPayload>> {
     private final IDawg<TPayload> dawg;
     private final Class<TPayload> cls;
 

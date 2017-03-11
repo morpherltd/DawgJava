@@ -2,7 +2,7 @@ package com.morpherltd.dawg;
 
 import java.util.function.Function;
 
-public class DawgExtensions<T, TPayload>
+class DawgExtensions<T, TPayload>
 {
     public static <T, TPayload> Dawg toDawg(Iterable<T> keys, Function<T, Iterable<Character>> key, Function<T, TPayload> payload, Class<TPayload> cls)
     {

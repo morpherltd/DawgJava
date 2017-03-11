@@ -1,10 +1,6 @@
 package com.morpherltd.dawg;
 
-import com.morpherltd.dawg.adject.DictionaryPayloadCollection;
-
-import java.lang.reflect.Constructor;
-
-public class NewInstance {
+class NewInstance {
 
     public static <TPayload> TPayload make(Class cls) {
         return null;

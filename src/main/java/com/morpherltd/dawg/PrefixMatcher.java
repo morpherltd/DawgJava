@@ -4,7 +4,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class PrefixMatcher<TPayload> {
+class PrefixMatcher<TPayload> {
     private final StringBuilder sb;
     private final Class<TPayload> cls;
 

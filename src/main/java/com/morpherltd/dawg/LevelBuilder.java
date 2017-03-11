@@ -2,7 +2,7 @@ package com.morpherltd.dawg;
 
 import java.util.*;
 
-public class LevelBuilder<TPayload> {
+class LevelBuilder<TPayload> {
     public static <TPayload> void buildLevelsExcludingRoot(Node<TPayload> root) {
         ArrayList<HashMap<NodeWrapper<TPayload>, NodeWrapper<TPayload>>> levels
             = new ArrayList<>();

@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Created by rok on 10-Mar-17.
  */
-public class Program {
+class Program {
     public static void main(String[] args) throws IOException {
         new Program().run();
     }

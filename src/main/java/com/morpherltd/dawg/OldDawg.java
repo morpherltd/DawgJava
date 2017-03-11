@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public class OldDawg<TPayload> implements IDawg<TPayload> {
+class OldDawg<TPayload> implements IDawg<TPayload> {
     final Node<TPayload> root;
     final Class<TPayload> cls;
 

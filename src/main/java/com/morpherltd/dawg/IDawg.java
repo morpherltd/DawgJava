@@ -3,7 +3,7 @@ package com.morpherltd.dawg;
 import java.util.Iterator;
 import java.util.Map;
 
-public interface IDawg<TPayload> {
+interface IDawg<TPayload> {
     TPayload get(Iterable<Character> word) throws IllegalAccessException, InstantiationException;
 
     int getLongestCommonPrefixLength(Iterable<Character> word);
