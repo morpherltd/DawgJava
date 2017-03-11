@@ -11,9 +11,9 @@ public class LevelBuilder<TPayload> {
 
         push(stack, root);
 
-        long tSuma = 0;
+//        long tSuma = 0;
+//        System.out.println("Start");
 
-        System.out.println("Start");
         Map.Entry<Character, Node<TPayload>> cur = null;
         while (stack.size() > 0) {
             if (stack.peek().ChildIterator.hasNext()) {
@@ -49,7 +49,7 @@ public class LevelBuilder<TPayload> {
                     } else {
                         dictionary.put(nodeWrapper, nodeWrapper);
                     }
-                    tSuma += System.currentTimeMillis() - tStart;
+//                    tSuma += System.currentTimeMillis() - tStart;
 
                     int parentLevel = current.Level + 1;
 
@@ -60,9 +60,9 @@ public class LevelBuilder<TPayload> {
             }
         }
 
-        double elapsedSeconds = tSuma / 1000.0;
-        System.out.println("\t lapsed seconds: " + elapsedSeconds);
-        System.out.println("Stop");
+//        double elapsedSeconds = tSuma / 1000.0;
+//        System.out.println("\t lapsed seconds: " + elapsedSeconds);
+//        System.out.println("Stop");
     }
 
     private static <TPayload> void push(Deque<StackNode<TPayload>> stack,

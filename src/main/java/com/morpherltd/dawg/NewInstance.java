@@ -7,23 +7,23 @@ import java.lang.reflect.Constructor;
 public class NewInstance {
 
     public static <TPayload> TPayload make(Class cls) {
-//        return null;
-        try {
-            return (TPayload) cls.newInstance();
-        } catch (InstantiationException e) {
-            try {
-                if (cls == DictionaryPayloadCollection.class) {
-                    return null;
-                }
-                Constructor<TPayload> ctor = cls.getConstructor(String.class);
-                TPayload tp = ctor.newInstance(get(cls).toString());
-                return tp;
-            } catch (Exception e1) {
-                throw new RuntimeException(e1);
-            }
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return null;
+//        try {
+//            return (TPayload) cls.newInstance();
+//        } catch (InstantiationException e) {
+//            try {
+//                if (cls == DictionaryPayloadCollection.class) {
+//                    return null;
+//                }
+//                Constructor<TPayload> ctor = cls.getConstructor(String.class);
+//                TPayload tp = ctor.newInstance(get(cls).toString());
+//                return tp;
+//            } catch (Exception e1) {
+//                throw new RuntimeException(e1);
+//            }
+//        } catch (IllegalAccessException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     private static Object get(Class tp) {

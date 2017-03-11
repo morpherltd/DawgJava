@@ -33,36 +33,32 @@ public class DawgTests extends TestCase {
     public void testPresistance() {
         DawgBuilder<Integer> dawgBuilder = new DawgBuilder<> (Integer.class);
 
-        dawgBuilder.insert (Lists.charactersOf("cone"), 10);
-        dawgBuilder.insert (Lists.charactersOf("bone"), 10);
-        dawgBuilder.insert (Lists.charactersOf("gone"), 9);
-        dawgBuilder.insert (Lists.charactersOf("go"), 5);
-        dawgBuilder.insert (Lists.charactersOf("tip"), 3);
-        dawgBuilder.insert (Lists.charactersOf("tap"), 3);
+        dawgBuilder.insert(Lists.charactersOf("cone"), 10);
+        dawgBuilder.insert(Lists.charactersOf("bone"), 10);
+        dawgBuilder.insert(Lists.charactersOf("gone"), 9);
+        dawgBuilder.insert(Lists.charactersOf("go"), 5);
+        dawgBuilder.insert(Lists.charactersOf("tip"), 3);
+        dawgBuilder.insert(Lists.charactersOf("tap"), 3);
 
         DawgTestsHelper<Integer> helper = new DawgTestsHelper<>();
         Dawg<Integer> rehydrated = helper.getDawg(dawgBuilder);
 
-//        assertEquals(10, (int) rehydrated.get(Lists.charactersOf("cone")));
-//        assertEquals(10, (int) rehydrated.get(Lists.charactersOf("bone")));
-//        assertNull(rehydrated.get(Lists.charactersOf("cones")));
-//        assertEquals(9, (int) rehydrated.get(Lists.charactersOf("gone")));
-//        assertNull(rehydrated.get(Lists.charactersOf("g")));
-//        assertEquals(5, (int) rehydrated.get(Lists.charactersOf("go")));
-//        assertNull(rehydrated.get(Lists.charactersOf("god")));
-//        assertEquals(3, (int) rehydrated.get(Lists.charactersOf("tip")));
-//        assertEquals(3, (int) rehydrated.get(Lists.charactersOf("tap")));
-//        assertNull(rehydrated.get(Lists.charactersOf("")));
         assertEquals(10, (int) rehydrated.get(Lists.charactersOf("cone")));
         assertEquals(10, (int) rehydrated.get(Lists.charactersOf("bone")));
-        assertEquals(0, (int) rehydrated.get(Lists.charactersOf("cones")));
         assertEquals(9, (int) rehydrated.get(Lists.charactersOf("gone")));
-        assertEquals(0, (int) rehydrated.get(Lists.charactersOf("g")));
         assertEquals(5, (int) rehydrated.get(Lists.charactersOf("go")));
-        assertEquals(0, (int) rehydrated.get(Lists.charactersOf("god")));
         assertEquals(3, (int) rehydrated.get(Lists.charactersOf("tip")));
         assertEquals(3, (int) rehydrated.get(Lists.charactersOf("tap")));
-        assertEquals(0, (int) rehydrated.get(Lists.charactersOf("")));
+
+        assertNull(rehydrated.get(Lists.charactersOf("cones")));
+        assertNull(rehydrated.get(Lists.charactersOf("g")));
+        assertNull(rehydrated.get(Lists.charactersOf("god")));
+        assertNull(rehydrated.get(Lists.charactersOf("")));
+
+//        assertEquals(0, (int) rehydrated.get(Lists.charactersOf("cones")));
+//        assertEquals(0, (int) rehydrated.get(Lists.charactersOf("g")));
+//        assertEquals(0, (int) rehydrated.get(Lists.charactersOf("god")));
+//        assertEquals(0, (int) rehydrated.get(Lists.charactersOf("")));
 
     }
 
@@ -119,31 +115,31 @@ public class DawgTests extends TestCase {
     }
 
     public void testEnekoWordList() throws IOException {
-        long tStart = System.currentTimeMillis();
+//        long tStart = System.currentTimeMillis();
 
         String fileName = "eneko-words.txt";
-        ArrayList<String> words = readLinesFromFile(fileName, 20000);
+        ArrayList<String> words = readLinesFromFile(fileName, 5000);
 
         DawgBuilder<Boolean> dawgBuilder = new DawgBuilder<>(Boolean.class);
 
-        System.out.println("Eneko inserting");
+//        System.out.println("Eneko inserting");
         for (String word : words) {
             dawgBuilder.insert(Lists.charactersOf(word), true);
         }
 
-        System.out.println("Eneko getDawg");
+//        System.out.println("Eneko getDawg");
         DawgTestsHelper<Boolean> helper = new DawgTestsHelper<>();
         Dawg<Boolean> rehydrated = helper.getDawg(dawgBuilder);
 
-        System.out.println("Eneko get");
+//        System.out.println("Eneko get");
         for (String word : words) {
             assertTrue(rehydrated.get(Lists.charactersOf(word)));
         }
 
-        long tEnd = System.currentTimeMillis();
-        long tDelta = tEnd - tStart;
-        double elapsedSeconds = tDelta / 1000.0;
-        System.out.println("Eneko lapsed seconds: " + elapsedSeconds);
+//        long tEnd = System.currentTimeMillis();
+//        long tDelta = tEnd - tStart;
+//        double elapsedSeconds = tDelta / 1000.0;
+//        System.out.println("Eneko lapsed seconds: " + elapsedSeconds);
     }
 
     public void testMatchPrefix() {
@@ -181,8 +177,8 @@ public class DawgTests extends TestCase {
         }
         assertTrue(count1 == 0);
         assertTrue(count2 == 0);
-        assertFalse(dawg.get(Lists.charactersOf("")));
-        assertFalse(dawg.get(Lists.charactersOf("boot")));
+        assertNull(dawg.get(Lists.charactersOf("")));
+        assertNull(dawg.get(Lists.charactersOf("boot")));
     }
 
     public void testSuffixMatch() {
