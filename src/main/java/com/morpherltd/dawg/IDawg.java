@@ -1,6 +1,5 @@
 package com.morpherltd.dawg;
 
-import java.util.Iterator;
 import java.util.Map;
 
 interface IDawg<TPayload> {

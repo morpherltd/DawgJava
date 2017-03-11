@@ -1,18 +1,6 @@
 package com.yielderable;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static com.yielderable.Completed.completed;
-import static com.yielderable.Exceptions.unchecked;
-import static com.yielderable.FlowControl.youMayProceed;
-import static com.yielderable.IfAbsent.ifAbsent;
-import static com.yielderable.Message.message;
 
 public interface Yielderable<T> extends Iterable<T> {
 
