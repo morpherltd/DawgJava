@@ -6,7 +6,7 @@ package com.morpherltd.dawg;
  * From Stackoverflow:
  * http://stackoverflow.com/questions/430479/how-do-i-use-an-equivalent-to-c-reference-parameters-in-java/431152#431152
  */
-public class _<E> {
+class _<E> {
     E ref;
     public _( E e ){
         ref = e;

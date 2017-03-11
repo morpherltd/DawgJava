@@ -1,6 +1,6 @@
 package com.morpherltd.dawg;
 
-import com.morpherltd.dawg.adject.WordJoiner;
+import com.morpherltd.dawg.WordJoiner;
 import junit.framework.TestCase;
 
 /**

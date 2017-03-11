@@ -1,6 +1,6 @@
 package com.morpherltd.dawg;
 
-public class Child {
+class Child {
     public final int Index;
     public final short CharIndex;
 

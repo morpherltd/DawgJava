@@ -1,19 +1,13 @@
 package com.morpherltd.dawg;
 
 import com.google.common.base.Joiner;
-import com.infomancers.collections.yield.Yielder;
-import com.morpherltd.dawg.helpers.BinaryUtil;
-import com.morpherltd.dawg.helpers.MReader;
 import com.yielderable.Yielderable;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 
-import static com.morpherltd.dawg.MatrixDawg.getCharToIndexPlusOneMap;
-import static com.morpherltd.dawg.MatrixDawg.readArray;
-
-public class YaleDawg<TPayload> implements IDawg<TPayload> {
+class YaleDawg<TPayload> implements IDawg<TPayload> {
     private final Class<TPayload> cls;
 
     private final TPayload[] payloads;

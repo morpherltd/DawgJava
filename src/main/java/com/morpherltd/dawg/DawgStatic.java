@@ -1,15 +1,12 @@
 package com.morpherltd.dawg;
 
-import com.morpherltd.dawg.helpers.MReader;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.ParameterizedType;
 import java.util.function.Function;
 
 import static com.morpherltd.dawg.Dawg.Readers;
 
-public class DawgStatic<TPayload> {
+class DawgStatic<TPayload> {
     private final Class<TPayload> cls;
 
     public DawgStatic(Class<TPayload> cls) {

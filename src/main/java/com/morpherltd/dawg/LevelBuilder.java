@@ -2,7 +2,7 @@ package com.morpherltd.dawg;
 
 import java.util.*;
 
-public class LevelBuilder<TPayload> {
+class LevelBuilder<TPayload> {
     public static <TPayload> void buildLevelsExcludingRoot(Node<TPayload> root) {
         ArrayList<HashMap<NodeWrapper<TPayload>, NodeWrapper<TPayload>>> levels
             = new ArrayList<>();
@@ -11,11 +11,16 @@ public class LevelBuilder<TPayload> {
 
         push(stack, root);
 
+//        long tSuma = 0;
+//        System.out.println("Start");
+
         Map.Entry<Character, Node<TPayload>> cur = null;
         while (stack.size() > 0) {
             if (stack.peek().ChildIterator.hasNext()) {
                 cur = stack.peek().ChildIterator.next();
+
                 push(stack, cur.getValue());
+
             } else {
                 StackNode<TPayload> current = stack.pop();
                 if (stack.size() > 0) {
@@ -34,16 +39,17 @@ public class LevelBuilder<TPayload> {
                         current.Node, parent.Node, cur.getKey()
                     );
 
+                    long tStart = System.currentTimeMillis();
                     if (dictionary.containsKey(nodeWrapper)) {
                         NodeWrapper<TPayload> existing =
                             dictionary.get(nodeWrapper);
                         parent.Node.children().put(
                             cur.getKey(), existing.Node
                         );
-
                     } else {
                         dictionary.put(nodeWrapper, nodeWrapper);
                     }
+//                    tSuma += System.currentTimeMillis() - tStart;
 
                     int parentLevel = current.Level + 1;
 
@@ -53,6 +59,10 @@ public class LevelBuilder<TPayload> {
                 }
             }
         }
+
+//        double elapsedSeconds = tSuma / 1000.0;
+//        System.out.println("\t lapsed seconds: " + elapsedSeconds);
+//        System.out.println("Stop");
     }
 
     private static <TPayload> void push(Deque<StackNode<TPayload>> stack,

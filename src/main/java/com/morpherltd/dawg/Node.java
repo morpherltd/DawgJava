@@ -1,12 +1,11 @@
 package com.morpherltd.dawg;
 
 
-import com.infomancers.collections.yield.Yielder;
 import com.yielderable.Yielderable;
 
 import java.util.*;
 
-public class Node<TPayload> {
+class Node<TPayload> {
     private final HashMap<Character, Node<TPayload>> _children
         = new HashMap<>();
 
@@ -16,7 +15,7 @@ public class Node<TPayload> {
 
     public Node(Class<TPayload> cls) {
         this.cls = cls;
-        _payload = (TPayload) NewInstance.get(this.cls);
+        _payload = (TPayload) NewInstance.make(this.cls);
     }
 
     public TPayload getPayload() {

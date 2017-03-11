@@ -1,17 +1,15 @@
 package com.morpherltd.dawg;
 
 import com.google.common.base.Joiner;
-import com.morpherltd.dawg.helpers.MReader;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class MatrixDawg<TPayload> implements IDawg <TPayload> {
+class MatrixDawg<TPayload> implements IDawg <TPayload> {
     final Class<TPayload> cls;
 
     @Override

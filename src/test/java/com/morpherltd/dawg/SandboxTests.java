@@ -1,8 +1,6 @@
 package com.morpherltd.dawg;
 
 
-import com.morpherltd.dawg.adject.Adjectivizer;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import junit.framework.TestCase;
 
 import java.io.IOException;

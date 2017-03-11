@@ -4,7 +4,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class PrefixMatcher<TPayload> {
+class PrefixMatcher<TPayload> {
     private final StringBuilder sb;
     private final Class<TPayload> cls;
 
@@ -20,7 +20,7 @@ public class PrefixMatcher<TPayload> {
 
         if (node == null) return result;
 
-        if (!node.getPayload().equals(NewInstance.make(cls)))
+        if (node.getPayload() != null)
         {
             result.add(new AbstractMap.SimpleEntry<>(
                 sb.toString(), node.getPayload())

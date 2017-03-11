@@ -15,7 +15,7 @@ public class DawgBuilderTests extends TestCase {
 
         _<Integer> n = new _<>(-1);
         assertEquals(true, db.tryGetValue(Lists.charactersOf(""), n));
-        assertEquals(0, (int) n.g());
+        assertNull(n.g());
     }
 
     public void testIncrementValue() {
@@ -33,7 +33,10 @@ public class DawgBuilderTests extends TestCase {
     private static void increment(DawgBuilder<Integer> db, Iterable<Character> key) {
         _<Integer> n = new _<>(-1);
         db.tryGetValue(key, n);
-        db.insert(key, n.g() + 1);
+        if (n.g() == null)
+            db.insert(key, 0 + 1);
+        else
+            db.insert(key, n.g() + 1);
     }
 
     public void testIterableCountWorksForDawg()
@@ -45,7 +48,7 @@ public class DawgBuilderTests extends TestCase {
         assertTrue(dawg.get(Lists.charactersOf("apple")));
         assertTrue(dawg.get(Lists.charactersOf("banana")));
         assertTrue(dawg.get(Lists.charactersOf("orange")));
-        assertFalse(dawg.get(Lists.charactersOf("kiwi")));
+        assertNull(dawg.get(Lists.charactersOf("kiwi")));
 
 
         Iterator<Map.Entry<String, Boolean>> iterator = dawg.iterator();
