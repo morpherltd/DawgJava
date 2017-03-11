@@ -1,4 +1,4 @@
-package com.morpherltd.dawg.adject;
+package com.morpherltd.dawg;
 
 import java.io.IOException;
 
