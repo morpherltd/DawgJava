@@ -1,7 +1,5 @@
 package com.morpherltd.dawg;
 
-import java.io.IOException;
-
 public class Adjectivizer {
     final SingleWordAdjectivizer singleWordAdjectivizer = new SingleWordAdjectivizer();
 
