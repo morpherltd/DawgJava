@@ -39,8 +39,7 @@ public class DawgBuilderTests extends TestCase {
             db.insert(key, n.g() + 1);
     }
 
-    public void testIterableCountWorksForDawg()
-        throws IllegalAccessException, InstantiationException {
+    public void testIterableCountWorksForDawg() {
         String[] fruit = new String[]{"apple", "banana", "orange"};
 
         Dawg<Boolean> dawg = DawgExtensions.toDawg(Arrays.asList(fruit), f -> Lists.charactersOf(f), f -> true, Boolean.class);
@@ -59,9 +58,5 @@ public class DawgBuilderTests extends TestCase {
         }
 
         assertEquals(3, count);
-    }
-
-    private static String iterToStr(Iterable<Character> chars) {
-        return Joiner.on("").join(chars);
     }
 }

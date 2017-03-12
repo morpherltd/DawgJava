@@ -3,10 +3,7 @@ package com.morpherltd.dawg;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
@@ -109,7 +106,7 @@ public class DawgTests extends TestCase {
         assertTrue(rehydrated.get(Lists.charactersOf(longString)));
     }
 
-    public void testEnekoWordList() throws IOException {
+    public void testEnekoWordList() {
 //        long tStart = System.currentTimeMillis();
 
         String fileName = "eneko-words.txt";
@@ -193,22 +190,32 @@ public class DawgTests extends TestCase {
         assertTrue(count1 == 2);
     }
 
-    private ArrayList<String> readLinesFromFile(final String fileName, int numLines) throws IOException {
+    private ArrayList<String> readLinesFromFile(final String fileName, int numLines) {
         URL resource = getClass().getClassLoader().getResource(fileName);
         File file = new File(resource.getPath());
-        FileReader fileReader = new FileReader(file);
+        FileReader fileReader = null;
+        try {
+            fileReader = new FileReader(file);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         BufferedReader bufferedReader = new BufferedReader(fileReader);
         ArrayList<String> words = new ArrayList<>();
         String line = null;
         int i = 0;
-        while ((line = bufferedReader.readLine()) != null) {
-            words.add(line);
-            i++;
-            if (i >= numLines) {
-                break;
+
+        try {
+            while ((line = bufferedReader.readLine()) != null) {
+                words.add(line);
+                i++;
+                if (i >= numLines) {
+                    break;
+                }
             }
+            bufferedReader.close();
+        } catch (IOException e) {
+            throw new RuntimeException();
         }
-        bufferedReader.close();
         return words;
     }
 

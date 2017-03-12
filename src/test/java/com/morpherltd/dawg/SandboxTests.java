@@ -1,15 +1,9 @@
 package com.morpherltd.dawg;
 
-
 import junit.framework.TestCase;
-
-import java.io.IOException;
 
 public class SandboxTests extends TestCase {
     private final Adjectivizer adjectivizer = new Adjectivizer();
-
-    public SandboxTests() throws IOException {
-    }
 
     public void testEmptyString() {
         assertEquals(
