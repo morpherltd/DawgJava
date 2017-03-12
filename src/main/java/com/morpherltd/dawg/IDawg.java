@@ -3,13 +3,13 @@ package com.morpherltd.dawg;
 import java.util.Map;
 
 interface IDawg<TPayload> {
-    TPayload get(Iterable<Character> word) throws IllegalAccessException, InstantiationException;
+    TPayload get(Iterable<Character> word);
 
     int getLongestCommonPrefixLength(Iterable<Character> word);
 
     Iterable<Map.Entry<String, TPayload>> matchPrefix(
         Iterable<Character> prefix
-    ) throws IllegalAccessException, InstantiationException;
+    );
 
     int getNodeCount();
 }

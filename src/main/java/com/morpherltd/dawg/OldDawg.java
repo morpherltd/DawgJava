@@ -54,8 +54,7 @@ class OldDawg<TPayload> implements IDawg<TPayload> {
 
     @Override
     public Iterable<Map.Entry<String, TPayload>> matchPrefix(
-            Iterable<Character> prefix)
-            throws InstantiationException, IllegalAccessException {
+            Iterable<Character> prefix) {
         Node<TPayload> node = findNode(prefix);
 
 //        if (node == null) return Enumerable.Empty <KeyValuePair <string, TPayload>> ();

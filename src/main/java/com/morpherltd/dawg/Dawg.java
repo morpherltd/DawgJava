@@ -94,11 +94,7 @@ class Dawg<TPayload> implements Iterable<Map.Entry<String, TPayload>> {
     }
 
     public TPayload get(Iterable<Character> word) {
-        try {
-            return dawg.get(word);
-        } catch (IllegalAccessException | InstantiationException  e) {
-            throw new RuntimeException(e);
-        }
+        return dawg.get(word);
     }
 
     public int getLongestCommonPrefixLength (Iterable<Character> word) {
@@ -107,19 +103,14 @@ class Dawg<TPayload> implements Iterable<Map.Entry<String, TPayload>> {
 
     public Iterable<Map.Entry<String, TPayload>> matchPrefix(
             Iterable<Character> prefix) {
-        try {
-            return dawg.matchPrefix(prefix);
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new RuntimeException(e);
-        }
+        return dawg.matchPrefix(prefix);
     }
 
     public int getNodeCount () {
         return dawg.getNodeCount ();
     }
 
-    public Iterable<Map.Entry<String, TPayload>> getEnumerator()
-            throws IllegalAccessException, InstantiationException {
+    public Iterable<Map.Entry<String, TPayload>> getEnumerator() {
         return matchPrefix(new ArrayList<>());
     }
 

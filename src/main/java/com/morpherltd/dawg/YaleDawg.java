@@ -93,8 +93,7 @@ class YaleDawg<TPayload> implements IDawg<TPayload> {
     final ChildComparer childComparer = new ChildComparer();
 
     @Override
-    public TPayload get(final Iterable<Character> word)
-        throws IllegalAccessException, InstantiationException {
+    public TPayload get(final Iterable<Character> word) {
         ArrayList<Integer> p = getPath(word);
         int node_i = p.get(p.size() - 1);
 
@@ -103,8 +102,7 @@ class YaleDawg<TPayload> implements IDawg<TPayload> {
         return getPayload(node_i);
     }
 
-    private TPayload getPayload(int node_i)
-        throws IllegalAccessException, InstantiationException {
+    private TPayload getPayload(int node_i) {
         return node_i < payloads.length ? payloads [node_i] : NewInstance.make(cls);
     }
 
@@ -176,7 +174,7 @@ class YaleDawg<TPayload> implements IDawg<TPayload> {
     }
 
     @Override
-    public Iterable<Map.Entry<String, TPayload>> matchPrefix(final Iterable<Character> prefix) throws IllegalAccessException, InstantiationException {
+    public Iterable<Map.Entry<String, TPayload>> matchPrefix(final Iterable<Character> prefix) {
         String prefixStr = Joiner.on("").join(prefix);
 
         ArrayList<Integer> p = getPath(prefix);
@@ -188,8 +186,7 @@ class YaleDawg<TPayload> implements IDawg<TPayload> {
     }
 
     private Yielderable<Map.Entry<String, TPayload>> matchPrefix (
-        StringBuilder sb, int node_i)
-        throws IllegalAccessException, InstantiationException {
+        StringBuilder sb, int node_i) {
         return yield -> {
                 if (node_i != -1)
                 {

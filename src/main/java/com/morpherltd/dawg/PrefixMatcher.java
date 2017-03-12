@@ -14,8 +14,7 @@ class PrefixMatcher<TPayload> {
     }
 
     public Iterable<Map.Entry<String, TPayload>> matchPrefix(
-            Node<TPayload> node)
-            throws IllegalAccessException, InstantiationException {
+            Node<TPayload> node) {
         ArrayList<Map.Entry<String, TPayload>> result = new ArrayList<>();
 
         if (node == null) return result;

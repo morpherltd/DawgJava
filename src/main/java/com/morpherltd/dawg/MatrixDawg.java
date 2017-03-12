@@ -13,23 +13,22 @@ class MatrixDawg<TPayload> implements IDawg <TPayload> {
     final Class<TPayload> cls;
 
     @Override
-    public TPayload get(final Iterable<Character> word)
-            throws IllegalAccessException, InstantiationException {
+    public TPayload get(final Iterable<Character> word) {
         int node_i = rootNodeIndex;
 
         for (char c : word)
         {
             int childIndexPlusOne = getChildIndexPlusOne(node_i, c);
 
-            if (childIndexPlusOne == 0) return cls.newInstance();
+            if (childIndexPlusOne == 0) return NewInstance.make(cls);
 
             node_i = childIndexPlusOne - 1;
         }
 
-        if (node_i == -1) return cls.newInstance();
+        if (node_i == -1) return NewInstance.make(cls);
 
         return node_i < payloads.length ?
-            payloads[node_i] : cls.newInstance();
+            payloads[node_i] : NewInstance.make(cls);
     }
 
     ArrayList<Integer> getPath(Iterable<Character> word) {
@@ -91,8 +90,7 @@ class MatrixDawg<TPayload> implements IDawg <TPayload> {
 
     @Override
     public ArrayList<Map.Entry<String, TPayload>> matchPrefix(
-            Iterable<Character> prefix)
-            throws IllegalAccessException, InstantiationException {
+            Iterable<Character> prefix) {
         ArrayList<Map.Entry<String, TPayload>> result = new ArrayList<>();
 
         String prefixStr = Joiner.on("").join(prefix);
@@ -108,7 +106,7 @@ class MatrixDawg<TPayload> implements IDawg <TPayload> {
             {
                 TPayload payload = payloads[node_i];
 
-                if (!cls.newInstance().equals(payload))
+                if (!NewInstance.make(cls).equals(payload))
                 {
                     result.add(new AbstractMap.SimpleEntry<>(
                         prefixStr, payload
@@ -153,7 +151,7 @@ class MatrixDawg<TPayload> implements IDawg <TPayload> {
                         {
                             TPayload payload = payloads [node_i];
 
-                            if (!cls.newInstance().equals(payload))
+                            if (!NewInstance.make(cls).equals(payload))
                             {
                                 result.add(new AbstractMap.SimpleEntry<>(
                                     sb.toString(), payload
