@@ -45,7 +45,9 @@
 
 
   </dependencies>
-
+  
+<!-- test comment-->
+  
   <build>
     <plugins>
       <plugin>
