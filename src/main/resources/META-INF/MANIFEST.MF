@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 Name: Russian Adjectivizer Library
-Main-Class: com.morpherltd.dawg.CommandLine
+Main-Class: com.morpherltd.adjectivizer.CommandLine
 Specification-Version: 0.0.0
 Implementation-Version: 2017-03-11
